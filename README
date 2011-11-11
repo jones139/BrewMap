@@ -6,3 +6,9 @@ OpenStreetMap data.
 
 Details to follow.....
 
+
+
+Dependencies
+============
+Python (>2.6?)
+python-psycopg2

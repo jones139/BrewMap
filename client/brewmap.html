@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OSM Brew Map</title>
+    <meta charset="utf-8" />
+    
+    <link rel="stylesheet" href="js/leaflet.css" />
+  </head>
+  <body>
+    <h2>OSM Brew Map (TileCache Test Version)</h2>
+    <div id="map" style="width: 600px; height: 400px"></div>
+    <p>Map data (c) OpenStreetMap contributors, CC-BY-SA</p>
+ 
+
+
+   <script src="js/leaflet.js"></script>
+    <script>
+      var map = new L.Map('map');
+      var osmURL = 'http://tile.openstreetmap.org/{z}/{x}/{y}.png';
+      var osmLayer = new L.TileLayer(osmURL,{maxZoom:18});
+      map.addLayer(osmLayer);
+
+      var brewURL = 'http://maps.webhop.net/cgi-bin/tilecache.cgi/1.0.0/brewmap/{z}/{x}/{y}.png';
+      var brewTylerLayer = new L.TileLayer(brewURL,{maxZoom:18});
+      map.addLayer(brewTylerLayer);
+
+      var baseMaps = {
+      "OSM": osmLayer,
+      };
+      
+      var overlayMaps = {
+      "historic (tyler)": brewTylerLayer
+      };
+
+      var layersControl = new L.Control.Layers(baseMaps, overlayMaps);
+        
+      map.addControl(layersControl);
+      map.setView(new L.LatLng(54.505, -2), 5)
+
+    </script>
+  </body>
+</html>
