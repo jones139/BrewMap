@@ -65,8 +65,9 @@ function loadDataSuccess(dataObj,statusText) {
 	    marker.bindPopup("<ul>"
 			     +"<li>"+dataObj[entity]['name']+"</li>"
 			     +"<li>"+brewType+"</li>"
-			     +"<li>"+"<a href='http://www.openstreetmap.org/browse/way/"+
-			                                 entity+"'>browse</a></li>"
+			     +"<li>"+"<a href='http://www.openstreetmap.org/browse/"+
+			     dataObj[entity]['type']+"/"+
+			     entity+"'>browse</a></li>"
 			     +"</ul>");
 	    map.addLayer(marker);
 	    //alert("adding "+dataObj[entity]['name']);
