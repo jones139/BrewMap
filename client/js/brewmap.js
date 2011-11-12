@@ -1,7 +1,8 @@
 
 // Define Global Variables
 var industryObj;
-var dataURL = "http://maps.webhop.net/BrewMap/server/";
+//var dataURL = "http://maps.webhop.net/BrewMap/server/";
+var dataURL = "http://localhost/BrewMap/server/";
 var map
 
 var LayerDefs = {
@@ -26,9 +27,15 @@ function load_brewmap_data() {
 	// loadDataSuccess function, no matter how many files we need to load.
 	jQuery.getJSON(
 	    dataURL+LayerDefs[layerName]['dataFile'],
-	    loadDataSuccess
+	    bound_loadDataSuccess(layerName)
 	);
     }
+}
+
+function bound_loadDataSuccess(layerName) {
+	return function(data) {
+		loadDataSuccess(data, layerName);
+	};
 }
 
 /* 
@@ -38,9 +45,8 @@ function load_brewmap_data() {
  *       It parses the file to create the map objects for display.
  * HIST: 12nov2011  GJ  ORIGINAL VERSION
  */
-function loadDataSuccess(dataObj,statusText) {
-
-    var layerName = dataObj['layerName'];
+function loadDataSuccess(dataObj,layerName) {
+    
     //alert('Loaded layer '+layerName);
 
     for (entity in dataObj) {
