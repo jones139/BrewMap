@@ -22,6 +22,13 @@ import psycopg2.extras
 import json
 
 def query2obj(sqlstr,options):
+    """
+    Takes an sql string to use as a query and executes it, returning the result.
+    The results are returned as an object.  It expectes the query to return
+    a field called 'way' which is a text formatted postgis geometry 
+    (ie POINT( longitude , latitude)).  This is parsed to create an object
+    called 'point' with 'lat' and 'lng' entries in it.
+    """
     connection = psycopg2.connect('dbname=%s' % options.dbname,\
                                      'user=%s' % options.dbuname)
     mark = connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -48,12 +55,16 @@ def query2obj(sqlstr,options):
 
 
 def make_brew_json(options):
+    """
+    Generates JSON files for various types of breweries from data in a 
+    postgresql database.
+    """
     sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
-                  " where microbrewery is not null"
+                  " where microbrewery is not null and microbrewery != 'no'"
     microbrewery_point = query2obj(sqlstr,options)
 
     sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
-                  " where microbrewery is not null"
+                  " where microbrewery is not null and microbrewery != 'no'"
     microbrewery_poly = query2obj(sqlstr,options)
 
     microbrewery = {'layerName':'brewmap_microbrewery'}
