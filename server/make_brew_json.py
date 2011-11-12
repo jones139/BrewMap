@@ -67,7 +67,8 @@ def make_brew_json(options):
     # to query, then a where clause which filters out the require data.
     sqlSelectStr = "select osm_id,name,amenity,"\
         "craft,industry,microbrewery," \
-        "\"addr:housename\", \"addr:housenumber\", \"addr:interpolation\","
+        "\"addr:housename\", \"addr:housenumber\", \"addr:interpolation\"," \
+        " "
 
     sqlSelectPointStr = " st_astext(st_transform(way,4326)) as way "\
         ",'node' as type from planet_osm_point "

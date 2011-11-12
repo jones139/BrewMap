@@ -1,19 +1,41 @@
-
+//    This file is part of BrewMap - a program to produce web maps
+//    of uk breweries.
+//
+//    BrewMap is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//    BrewMap is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with BrewMap.  If not, see <http://www.gnu.org/licenses/>.
+//
+//    Copyright Graham Jones 2011.
+//
+////////////////////////////////////////////////////////////////////////
 // Define Global Variables
 var industryObj;
-var dataURL = "http://maps.webhop.net/BrewMap/server/";
+//var dataURL = "http://maps.webhop.net/BrewMap/server/";
+var dataURL;
 var map
 
 var LayerDefs = {
     "brewery_industry": {
-	"dataFile": "brewmap_industry.json"
+	"dataFile": "brewmap_industry.json",
+	"iconImg": "images/factory.png"
     },
     "brewery_craft": {
-	"dataFile": "brewmap_craft.json"
+	"dataFile": "brewmap_craft.json",
+	"iconImg": "images/house.png"
     },
 
     "microbrewery": {
-	"dataFile": "brewmap_microbrewery.json"
+	"dataFile": "brewmap_microbrewery.json",
+	"iconImg": "images/drink.png"
     }
 
 };
@@ -78,14 +100,25 @@ function loadDataSuccess(dataObj,statusText) {
 
 
 function initialise_brewmap() {
-    //var dataURL = "file:///home/disk2/OSM/Maps/BrewMap/server";    
+    // Set the URL of the source of data for the map (../server)
+    // Thanks to http://programmingsolution.net/post/
+    //          URL-Parsing-Using-JavaScript-Get-Domain-Name-Port-Number-and-Virtual-Directory-Path.aspx
+    // for a pointer to getting this one working.
+    var pageURL = document.location.href;
+    var URLParts = pageURL.split('/');
+    URLParts[URLParts.length - 2] = 'server';
+    URLParts[URLParts.length - 1] = '';
+    dataURL = URLParts.join('/');
+
+    // Initialise the map object
     map = new L.Map('map');
     var osmURL = 'http://tile.openstreetmap.org/{z}/{x}/{y}.png';
     var osmLayer = new L.TileLayer(osmURL,{maxZoom:18});
     map.addLayer(osmLayer);
-    
     map.setView(new L.LatLng(54.505, -2), 5);
     
+
+    // Add the brewery information to the map
     load_brewmap_data();
 
 }
