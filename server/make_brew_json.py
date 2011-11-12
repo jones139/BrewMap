@@ -60,11 +60,13 @@ def make_brew_json(options):
     postgresql database.
     """
     sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
-                  " where microbrewery is not null and microbrewery != 'no'"
+                  " where microbrewery is not null and microbrewery != 'no'" \
+                  " and (disused is null or disused != 'yes')"
     microbrewery_point = query2obj(sqlstr,options)
 
     sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
-                  " where microbrewery is not null and microbrewery != 'no'"
+                  " where microbrewery is not null and microbrewery != 'no'" \
+                  " and (disused is null or disused != 'yes')"
     microbrewery_poly = query2obj(sqlstr,options)
 
     microbrewery = {'layerName':'brewmap_microbrewery'}
@@ -72,11 +74,13 @@ def make_brew_json(options):
     microbrewery.update(microbrewery_point)
 
     sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
-                  " where craft='brewery'"
+                  " where craft='brewery'" \
+                  " and (disused is null or disused != 'yes')"
     craft_point = query2obj(sqlstr,options)
 
     sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
-                  " where craft='brewery'"
+                  " where craft='brewery'" \
+                  " and (disused is null or disused != 'yes')"
     craft_poly = query2obj(sqlstr,options)
 
     craft = {'layerName':'brewmap_craft'}
@@ -85,11 +89,13 @@ def make_brew_json(options):
 
 
     sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
-                  " where industry='brewery'"
+                  " where industry='brewery'" \
+                  " and (disused is null or disused != 'yes')"
     industry_point = query2obj(sqlstr,options)
 
     sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
-                  " where industry='brewery'"
+                  " where industry='brewery'" \
+                  " and (disused is null or disused != 'yes')"
     industry_poly = query2obj(sqlstr,options)
 
     industry = {'layerName':'brewmap_industry'}
