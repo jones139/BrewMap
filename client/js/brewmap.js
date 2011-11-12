@@ -72,6 +72,10 @@ function load_brewmap_data() {
 }
 
 function bound_loadDataSuccess(layerName) {
+    // This function is used by load_brewmap_data to create a callback function that
+    // passes the layer name as a parameter - it is made to call loadDataSuccess().
+    // 12Nov2011 Craig Loftus
+    //
 	return function(data) {
 		loadDataSuccess(data, layerName);
 	};
