@@ -24,7 +24,7 @@ function load_brewmap_data() {
 	// This loads the required file, and passes it to loadDataSuccess, along with an extra
 	// argument, layerName which is the name of the Layer just loaded, so that we only need one
 	// loadDataSuccess function, no matter how many files we need to load.
-	jQuery.get(
+	jQuery.getJSON(
 	    dataURL+LayerDefs[layerName]['dataFile'],
 	    loadDataSuccess
 	);
@@ -38,9 +38,9 @@ function load_brewmap_data() {
  *       It parses the file to create the map objects for display.
  * HIST: 12nov2011  GJ  ORIGINAL VERSION
  */
-function loadDataSuccess(data,statusText) {
-    dataObj = eval('(' + data + ')');
-    var layerName = dataObj['layerName']
+function loadDataSuccess(dataObj,statusText) {
+
+    var layerName = dataObj['layerName'];
     //alert('Loaded layer '+layerName);
 
     for (entity in dataObj) {
