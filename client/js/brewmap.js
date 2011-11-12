@@ -1,8 +1,7 @@
 
 // Define Global Variables
 var industryObj;
-//var dataURL = "http://maps.webhop.net/BrewMap/server/";
-var dataURL = "http://localhost/BrewMap/server/";
+var dataURL = "http://maps.webhop.net/BrewMap/server/";
 var map
 
 var LayerDefs = {
