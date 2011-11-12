@@ -21,24 +21,41 @@
 var industryObj;
 //var dataURL = "http://maps.webhop.net/BrewMap/server/";
 var dataURL;
+var imageURL;
 var map
 
 var LayerDefs = {
-    "brewery_industry": {
+    "brewmap_industry": {
 	"dataFile": "brewmap_industry.json",
-	"iconImg": "images/factory.png"
+	"iconImg": "factory.png"
     },
-    "brewery_craft": {
+    "brewmap_craft": {
 	"dataFile": "brewmap_craft.json",
-	"iconImg": "images/house.png"
+	"iconImg": "house.png"
     },
 
-    "microbrewery": {
+    "brewmap_microbrewery": {
 	"dataFile": "brewmap_microbrewery.json",
-	"iconImg": "images/drink.png"
+	"iconImg": "drink.png"
     }
 
 };
+
+function makeIcons() {
+// Create Leaflet Icons using the images specified in LayerDefs.
+// The icon objects are added to LayrDefs.
+    for (var layerName in LayerDefs) {
+	var iconURL = imageURL + "/" + LayerDefs[layerName]['iconImg']
+	LayerDefs[layerName]['icon'] = L.Icon.extend({
+	    iconUrl: iconURL,
+	    shadowUrl: iconURL,
+	    iconSize: new L.Point(16,16),
+	    shadowSize: new L.Point(16,16),
+	    iconAnchor: new L.Point(8,8),
+	    popupAnchor: new L.Point(8,16)
+	});
+    }
+}
 
 function load_brewmap_data() {
     for (var layerName in LayerDefs) {
@@ -81,15 +98,18 @@ function loadDataSuccess(dataObj,statusText) {
 	    }
 	    //var marker = new L.Marker(posN);
 	    var marker = new L.CircleMarker(posN,
-					    {color:markerFillColour,
-					     fillColor:markerFillColour,
-					     fillOpacity:0.5});
+	    				    {color:markerFillColour,
+	    				     fillColor:markerFillColour,
+	    				     fillOpacity:0.5});
+	    //var marker = new L.Marker(posN, {icon: LayerDefs[layerName]['icon']});
 	    marker.bindPopup("<ul>"
 			     +"<li>"+dataObj[entity]['name']+"</li>"
 			     +"<li>"+brewType+"</li>"
 			     +"<li>"+"<a href='http://www.openstreetmap.org/browse/"+
 			     dataObj[entity]['type']+"/"+
 			     entity+"'>browse</a></li>"
+			     +"<li>Address:"+dataObj[entity]['addr:housename']+","
+			     +dataObj[entity]['addr:housename']+"</li>"
 			     +"</ul>");
 	    map.addLayer(marker);
 	    //alert("adding "+dataObj[entity]['name']);
@@ -110,6 +130,10 @@ function initialise_brewmap() {
     URLParts[URLParts.length - 1] = '';
     dataURL = URLParts.join('/');
 
+    URLParts = pageURL.split('/');
+    URLParts[URLParts.length - 1] = 'images';
+    imageURL = URLParts.join('/');
+
     // Initialise the map object
     map = new L.Map('map');
     var osmURL = 'http://tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -119,6 +143,7 @@ function initialise_brewmap() {
     
 
     // Add the brewery information to the map
+    makeIcons();
     load_brewmap_data();
 
 }
