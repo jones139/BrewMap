@@ -46,7 +46,7 @@ function makeIcons() {
 // The icon objects are added to LayrDefs.
     for (var layerName in LayerDefs) {
 	var iconURL = imageURL + "/" + LayerDefs[layerName]['iconImg']
-	LayerDefs[layerName]['icon'] = L.Icon.extend({
+	var iconType = L.Icon.extend({
 	    iconUrl: iconURL,
 	    shadowUrl: iconURL,
 	    iconSize: new L.Point(16,16),
@@ -54,6 +54,7 @@ function makeIcons() {
 	    iconAnchor: new L.Point(8,8),
 	    popupAnchor: new L.Point(8,16)
 	});
+	LayerDefs[layerName]['icon'] = new iconType()
     }
 }
 
@@ -97,17 +98,17 @@ function loadDataSuccess(dataObj,statusText) {
 		markerFillColour = 'green';
 	    }
 	    //var marker = new L.Marker(posN);
-	    var marker = new L.CircleMarker(posN,
-	    				    {color:markerFillColour,
-	    				     fillColor:markerFillColour,
-	    				     fillOpacity:0.5});
-	    //var marker = new L.Marker(posN, {icon: LayerDefs[layerName]['icon']});
+	    //var marker = new L.CircleMarker(posN,
+	    //				    {color:markerFillColour,
+	    //				     fillColor:markerFillColour,
+	    //				     fillOpacity:0.5});
+	    var marker = new L.Marker(posN, {icon: LayerDefs[layerName]['icon']});
 	    marker.bindPopup("<ul>"
 			     +"<li>"+dataObj[entity]['name']+"</li>"
 			     +"<li>"+brewType+"</li>"
 			     +"<li>"+"<a href='http://www.openstreetmap.org/browse/"+
 			     dataObj[entity]['type']+"/"+
-			     entity+"'>browse</a></li>"
+			     entity+"' target='_blank'>browse</a></li>"
 			     +"<li>Address:"+dataObj[entity]['addr:housename']+","
 			     +dataObj[entity]['addr:housename']+"</li>"
 			     +"</ul>");
