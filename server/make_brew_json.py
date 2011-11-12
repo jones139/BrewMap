@@ -35,8 +35,8 @@ def query2obj(sqlstr,options):
         for record in records:
             mb = {}
             point = {}
-            point['x'] = record['way'].split("POINT(")[1].split(" ")[0]
-            point['y'] = record['way'].split("POINT(")[1].split(" ")[1]
+            point['lng'] = record['way'].split("POINT(")[1].split(" ")[0]
+            point['lat'] = record['way'].split("POINT(")[1].split(" ")[1]
             mb['point'] = point
             for key in record:
                 if key != "way":
@@ -49,40 +49,40 @@ def query2obj(sqlstr,options):
 
 
 def make_brew_json(options):
-    sqlstr = "select osm_id,st_astext(way) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
+    sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
                   " where microbrewery is not null"
     microbrewery_point = query2obj(sqlstr,options)
 
-    sqlstr = "select osm_id,st_astext(st_centroid(way)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
+    sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
                   " where microbrewery is not null"
     microbrewery_poly = query2obj(sqlstr,options)
 
-    microbrewery = {}
+    microbrewery = {'layerName':'brewmap_microbrewery'}
     microbrewery.update(microbrewery_poly)
     microbrewery.update(microbrewery_point)
 
-    sqlstr = "select osm_id,st_astext(way) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
+    sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
                   " where craft='brewery'"
     craft_point = query2obj(sqlstr,options)
 
-    sqlstr = "select osm_id,st_astext(st_centroid(way)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
+    sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
                   " where craft='brewery'"
     craft_poly = query2obj(sqlstr,options)
 
-    craft = {}
+    craft = {'layerName':'brewmap_craft'}
     craft.update(craft_poly)
     craft.update(craft_point)
 
 
-    sqlstr = "select osm_id,st_astext(way) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
+    sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
                   " where industry='brewery'"
     industry_point = query2obj(sqlstr,options)
 
-    sqlstr = "select osm_id,st_astext(st_centroid(way)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
+    sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
                   " where industry='brewery'"
     industry_poly = query2obj(sqlstr,options)
 
-    industry = {}
+    industry = {'layerName':'brewmap_industry'}
     industry.update(industry_poly)
     industry.update(industry_point)
 
