@@ -59,6 +59,11 @@ def make_brew_json(options):
     Generates JSON files for various types of breweries from data in a 
     postgresql database.
     """
+    sqlSelectStr = "select osm_id,name,amenity,"\
+        "craft,industry,microbrewery, 'node' as type," \
+        "\"addr:housename\", \"addr:housenumber\", \"addr:interpolation\"," \
+        "st_astext(st_transform(st_centrioid(way),4326)) as way,"\
+        "from planet_osm_point "
     sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
                   " where microbrewery is not null and microbrewery != 'no'" \
                   " and (disused is null or disused != 'yes')"
