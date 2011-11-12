@@ -1,1 +1,1 @@
-{"layerName": "brewmap_industry", "136451213": {"amenity": null, "name": "Camerons Brewery", "point": {"lat": "54.6814727201446)", "lng": "-1.21255127561867"}, "industry": "brewery", "microbrewery": null, "craft": null, "osm_id": 136451213}}
+{"layerName": "brewmap_industry", "136451213": {"addr:housenumber": null, "amenity": null, "name": "Camerons Brewery", "point": {"lat": "54.6814727201446)", "lng": "-1.21255127561867"}, "industry": "brewery", "addr:interpolation": null, "addr:housename": null, "microbrewery": null, "craft": null, "osm_id": 136451213, "type": "way"}}

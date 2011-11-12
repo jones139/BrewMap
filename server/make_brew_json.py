@@ -59,54 +59,65 @@ def make_brew_json(options):
     Generates JSON files for various types of breweries from data in a 
     postgresql database.
     """
-    sqlSelectStr = "select osm_id,name,amenity,"\
-        "craft,industry,microbrewery, 'node' as type," \
-        "\"addr:housename\", \"addr:housenumber\", \"addr:interpolation\"," \
-        "st_astext(st_transform(st_centrioid(way),4326)) as way,"\
-        "from planet_osm_point "
-    sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
-                  " where microbrewery is not null and microbrewery != 'no'" \
-                  " and (disused is null or disused != 'yes')"
-    microbrewery_point = query2obj(sqlstr,options)
 
-    sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
-                  " where microbrewery is not null and microbrewery != 'no'" \
-                  " and (disused is null or disused != 'yes')"
-    microbrewery_poly = query2obj(sqlstr,options)
+    # Define the main parts of the SQL queries required to extract the data
+    # we separate the query into a select part which defines most of the
+    # fields to extract, a SelectPoint or SelectPolygon part, which 
+    # adds the type to the resulting data, and specifies the table
+    # to query, then a where clause which filters out the require data.
+    sqlSelectStr = "select osm_id,name,amenity,"\
+        "craft,industry,microbrewery," \
+        "\"addr:housename\", \"addr:housenumber\", \"addr:interpolation\","
+
+    sqlSelectPointStr = " st_astext(st_transform(way,4326)) as way "\
+        ",'node' as type from planet_osm_point "
+
+    sqlSelectPolygonStr = "st_astext(st_transform(st_centroid(way),4326)) as way "\
+        ",'way' as type from planet_osm_polygon "
+
+    # MicroBreweries
+    sqlWhereStr = " where microbrewery is not null and microbrewery != 'no'" \
+        " and (disused is null or disused != 'yes')"
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPointStr,sqlWhereStr)
+    microbrewery_point = query2obj(sqlStr,options)
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPolygonStr,sqlWhereStr)
+    microbrewery_poly = query2obj(sqlStr,options)
 
     microbrewery = {'layerName':'brewmap_microbrewery'}
     microbrewery.update(microbrewery_poly)
     microbrewery.update(microbrewery_point)
 
-    sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
-                  " where craft='brewery'" \
-                  " and (disused is null or disused != 'yes')"
-    craft_point = query2obj(sqlstr,options)
-
-    sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
-                  " where craft='brewery'" \
-                  " and (disused is null or disused != 'yes')"
-    craft_poly = query2obj(sqlstr,options)
+    # Craft Breweries
+    sqlWhereStr = " where craft = 'brewery'" \
+        " and (disused is null or disused != 'yes')"
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPointStr,sqlWhereStr)
+    craft_point = query2obj(sqlStr,options)
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPolygonStr,sqlWhereStr)
+    craft_poly = query2obj(sqlStr,options)
 
     craft = {'layerName':'brewmap_craft'}
     craft.update(craft_poly)
     craft.update(craft_point)
 
-
-    sqlstr = "select osm_id,st_astext(st_transform(way,4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_point" \
-                  " where industry='brewery'" \
-                  " and (disused is null or disused != 'yes')"
-    industry_point = query2obj(sqlstr,options)
-
-    sqlstr = "select osm_id,st_astext(st_transform(st_centroid(way),4326)) as way,name,amenity,craft,industry,microbrewery from planet_osm_polygon" \
-                  " where industry='brewery'" \
-                  " and (disused is null or disused != 'yes')"
-    industry_poly = query2obj(sqlstr,options)
+    # Industrial Breweries
+    sqlWhereStr = " where industry = 'brewery'" \
+        " and (disused is null or disused != 'yes')"
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPointStr,sqlWhereStr)
+    industry_point = query2obj(sqlStr,options)
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPolygonStr,sqlWhereStr)
+    industry_poly = query2obj(sqlStr,options)
 
     industry = {'layerName':'brewmap_industry'}
     industry.update(industry_poly)
     industry.update(industry_point)
 
+    # Write the files to disk
 
     outfile = open("%s_microbrewery.json" % options.outfile,"w")
     outfile.write(json.dumps(microbrewery))
