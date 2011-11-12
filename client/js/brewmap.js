@@ -47,9 +47,24 @@ function loadDataSuccess(data,statusText) {
 	if (entity != 'layerName') {
 	    var posN = new L.LatLng(dataObj[entity]['point']['lat'],
 				   dataObj[entity]['point']['lng']);
-	    var marker = new L.Marker(posN);
+	    var brewType = 'microbrewery';
+	    var markerFillColour = 'yellow';
+	    if (dataObj[entity]['industry']=="brewery") {
+		brewType = 'industrial';
+		markerFillColour = 'blue';
+	    }
+	    if (dataObj[entity]['craft']=="brewery") {
+		brewType = 'craft';
+		markerFillColour = 'green';
+	    }
+	    //var marker = new L.Marker(posN);
+	    var marker = new L.CircleMarker(posN,
+					    {color:markerFillColour,
+					     fillColor:markerFillColour,
+					     fillOpacity:0.5});
 	    marker.bindPopup("<ul>"
 			     +"<li>"+dataObj[entity]['name']+"</li>"
+			     +"<li>"+brewType+"</li>"
 			     +"<li>"+"<a href='http://www.openstreetmap.org/browse/way/"+
 			                                 entity+"'>browse</a></li>"
 			     +"</ul>");

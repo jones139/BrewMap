@@ -41,7 +41,6 @@ def query2obj(sqlstr,options):
             for key in record:
                 if key != "way":
                     mb[key] = record[key]
-            print mb
             microbreweries[record['osm_id']] = mb
         
     return microbreweries
