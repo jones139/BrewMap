@@ -4,11 +4,18 @@ UK BrewMap
 Client and Server software to produce the uk brewery map based on 
 OpenStreetMap data.
 
-Details to follow.....
+The server side code reads a postgresql database that has been populated with OpenStreetMap data using osm2pgsql.
+It queries the database to extract microbreweries (tagged microbrewery=yes), 'craft' breweries (craft=brewery) and 'industrial' breweries (industry=brewery).   It extracts data that is tagged as single points and ways representing areas.
+The data is saved as a simple json file that can be downloaded by the client code.
 
+The client code should run in any modern browser.  It downloads the json data prepared by the data using jQuery, parses it, and displays it on a map using the Leaflet library.
 
 
 Dependencies
 ============
 Python (>2.6?)
 python-psycopg2
+
+Contributors
+============
+The code in this repository includes jQuery (http://jquery.org) and Leaflet (http://leaflet.cloudmade.com)
