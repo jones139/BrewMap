@@ -167,16 +167,16 @@ function addStatistics(layerName,dataObj) {
 }
 
 function editButtonCallback() {
-    alert("editButtonCallBack");
-//http://www.openstreetmap.org/edit?bbox=-2.62082%2C53.75973%2C-2.61242%2C53.76383    
+    //alert("editButtonCallBack");
+    //http://www.openstreetmap.org/edit?bbox=-2.62082%2C53.75973%2C-2.61242%2C53.76383    
     var bounds = map.getBounds();
     var swPoint = bounds.getSouthWest();
     var nePoint = bounds.getNorthEast();
     var zoom = map.getZoom();
     var url = "http://www.openstreetmap.org/edit?bbox="
-	+ swPoint.lng + "%2C" + swPoint.lat
+	+ swPoint.lng + "%2C" + swPoint.lat + "%2C" 
 	+ nePoint.lng + "%2C" + nePoint.lat
-    alert(url);
+    //alert(url);
     window.open(url);
     
 }
