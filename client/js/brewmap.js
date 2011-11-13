@@ -166,6 +166,21 @@ function addStatistics(layerName,dataObj) {
     //alert("stats: "+layerName+" nWay="+statistics[layerName]['nWay']);
 }
 
+function editButtonCallback() {
+    alert("editButtonCallBack");
+//http://www.openstreetmap.org/edit?bbox=-2.62082%2C53.75973%2C-2.61242%2C53.76383    
+    var bounds = map.getBounds();
+    var swPoint = bounds.getSouthWest();
+    var nePoint = bounds.getNorthEast();
+    var zoom = map.getZoom();
+    var url = "http://www.openstreetmap.org/edit?bbox="
+	+ swPoint.lng + "%2C" + swPoint.lat
+	+ nePoint.lng + "%2C" + nePoint.lat
+    alert(url);
+    window.open(url);
+    
+}
+
 function initialise_brewmap() {
     // Set the URL of the source of data for the map (../server)
     // Thanks to http://programmingsolution.net/post/
@@ -188,6 +203,8 @@ function initialise_brewmap() {
     map.addLayer(osmLayer);
     map.setView(new L.LatLng(54.505, -2), 5);
     
+    // Set up the Edit Button
+    jQuery('#editButton').click(editButtonCallback);
 
     // Add the brewery information to the map
     makeIcons();
