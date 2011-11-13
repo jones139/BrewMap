@@ -1,0 +1,44 @@
+
+#page {
+    width:800px;
+}
+
+#header {
+    background-color:lightblue;
+
+}
+
+#map {
+    width: 600px; 
+    height: 400px;    
+    float:left;
+    border: 1px solid black;
+}
+
+#key {
+    float:left;
+    width:195px;
+    background-color:#f0f0f0;
+    border: 1px solid black;
+}
+
+#stats {
+    float:left;
+    width:195px;
+    height:100%;
+    background-color:#e0e0e0;
+    border: 1px solid black;
+}
+
+#footer {
+    clear:both;
+    background-color:#e0e0e0;
+    border: 1px solid black;
+    
+}
+
+table, th, td {
+    background-color:#f0f0f0;
+    border: 1px solid black;
+}
+

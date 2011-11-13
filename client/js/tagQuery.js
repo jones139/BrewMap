@@ -52,16 +52,21 @@ function bound_loadTagQuerySuccess(layerName) {
  * HIST: 13nov2011  GJ  ORIGINAL VERSION
  */
 function loadTagQuerySuccess(dataObj,layerName) {
+    var htmlStr = "<table><tr><th>Name</th><th>Browse</th><th>Edit</th></tr>";
     for (entity in dataObj) {
-	var htmlStr ="<p>"
-	    +"<b>Name: "+ dataObj[entity]['name']+"; "
-	    +"OSM Link: "+"<a href='http://www.openstreetmap.org/browse/"
+	htmlStr += "<tr>"
+	    +"<td>"+ dataObj[entity]['name']+"</td>"
+	    +"<td><a href='http://www.openstreetmap.org/browse/"
 	    +dataObj[entity]['type']+"/"
-	    +entity+"' target='_blank'>browse</a>"
-	    +"</p>";
+	    +entity+"' target='_blank'>Check OSM Data</a></td> "
+	    +"<td><a active='no' href='http://www.openstreetmap.org/edit?"
+	    +dataObj[entity]['type']+"="
+	    +entity+"' target='_blank'>Edit OSM Data</a></td>"
+	    +"</tr>";
 	//alert("htmlStr="+htmlStr);
-	jQuery("#table").append(htmlStr);
     }
+    htmlStr += "</table>";
+    jQuery("#tagQueryTable").append(htmlStr);
 //alert("adding "+dataObj[entity]['name']);
 }  
 

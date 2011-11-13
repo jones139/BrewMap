@@ -123,7 +123,10 @@ def make_brew_json(options):
     sqlWhereStr = " where name ilike('%brewery%')" \
         " and (disused is null or disused != 'yes')" \
         " and (industry is null or industry != 'brewery')" \
-        " and (craft is null or craft != 'brewery')"
+        " and (craft is null or craft != 'brewery')" \
+        " and (highway is null)" \
+        " and (leisure is null)" \
+        " and (landuse != 'farmyard' and landuse!='allotments' and landuse!='wharf')"
     sqlStr = "%s %s %s" % \
         (sqlSelectStr, sqlSelectPointStr,sqlWhereStr)
     tagQuery_point = query2obj(sqlStr,options)
@@ -131,7 +134,7 @@ def make_brew_json(options):
         (sqlSelectStr, sqlSelectPolygonStr,sqlWhereStr)
     tagQuery_poly = query2obj(sqlStr,options)
 
-    tagQuery = {'layerName':'tagQuery'}
+    tagQuery = {}
     tagQuery.update(tagQuery_poly)
     tagQuery.update(tagQuery_point)
 

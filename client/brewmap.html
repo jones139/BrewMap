@@ -4,27 +4,36 @@
     <title>OSM Brew Map</title>
     <meta charset="utf-8" />
     
+    <link rel="stylesheet" href="css/brewmap.css" />
     <link rel="stylesheet" href="js/leaflet.css" />
   </head>
   <body>
-    <h2>OSM Brew Map (Client Rendering)</h2>
-    <div id="map" style="width: 600px; height: 400px"></div>
-    <p>Map data (c) OpenStreetMap contributors, CC-BY-SA.  
-    For more information please see <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries"> the OpenStreetMap Wiki page</a>.</p>
-    <p>A list of possible tagging errors (ie name contains 'brewery' but it is not on this map, can be seen <a href="tagQueries.html">here</a></p>
-    <div id="key">
-      <h2>Key</h2>
-      <ol>
-	<li>Industrial Brewery <img src="images/factory.png"></li>
-	<li>Craft Brewery <img src="images/house.png"></li>
-	<li>Microbrewery <img src="images/drink.png"></li>
-      </ol>
-    </div>
-    <div id="stats">
-    </div>
-    <div id="table">
-    </div>
+    <div id="page">
+      <div id="header">
+	<h2>OSM Brew Map (Client Rendering)</h2>
+      </div>
+      <div id="main">
+	<div id="map"></div>
+	<div id="key">
+	  <h2>Key</h2>
+	  <ol>
+	    <li>Industrial Brewery <img src="images/factory.png"></li>
+	    <li>Craft Brewery <img src="images/house.png"></li>
+	    <li>Microbrewery <img src="images/drink.png"></li>
+	  </ol>
+	</div>
+	<div id="stats">
+	</div>
+      </div>
 
+      <div id="footer">
+	<p>Map data (c) OpenStreetMap contributors, CC-BY-SA.  
+	  For more information please see <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries"> the OpenStreetMap Wiki page</a>.</p>
+	<p>A list of possible tagging errors (ie name contains 'brewery' but it is not on this map, can be seen on the <a href="tagQueries.html">tagQueries</a> page).</p>
+	<div id="table">
+	</div>
+      </div>
+    </div>
    <script src="js/leaflet.js"></script>
    <script src="js/jquery-1.7.min.js"></script>
    <script src="js/parseURI.js"></script>

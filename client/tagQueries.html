@@ -3,13 +3,31 @@
   <head>
     <title>OSM Brew Map - Tag Queries</title>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/brewmap.css" />
     
   </head>
   <body>
-    <h2>OSM Brew Map Tag Queries</h2>
-    <p>Map data (c) OpenStreetMap contributors, CC-BY-SA.  
-    For more information please see <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries"> the OpenStreetMap Wiki page</a>.</p>
-    <div id="table">
+    <div id="header">
+      <h2>OSM Brew Map Tag Queries</h2>
+      <p>This page identifies entries in the OSM database that <em>might</em>
+	be breweries based on the name tag.   There are quite a few exceptions
+	to try to avoid false positivies (like parks called 'Brewer Fields').</p>
+      <p>
+	Please use the 'browse' links to check if these should be tagged as
+	industry=brewery or craft=brewery, then edit them.   The data for the
+	page is updated every 10 minutes so you can check back a bit later to
+	make sure your updated entries have disappeared from here and appered
+	on the main BrewMap map.
+      </p>
+    </div>
+    <div id="tagQueryTable">
+    </div>
+    <div id="footer">
+      <p>Note that the edit links do not work at the moment. I do not know why
+	- they use the same syntax as you get on the OSM 'browse' page for
+	the element.</p>
+      <p>Map data (c) OpenStreetMap contributors, CC-BY-SA.  
+	For more information please see <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries"> the OpenStreetMap Wiki page</a>.</p>
     </div>
 
    <script src="js/jquery-1.7.min.js"></script>
