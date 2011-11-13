@@ -18,11 +18,11 @@
 //
 ////////////////////////////////////////////////////////////////////////
 // Define Global Variables
-var industryObj;
-//var dataURL = "http://maps.webhop.net/BrewMap/server/";
 var dataURL;
 var imageURL;
-var map
+var map;
+var statistics = {};
+
 
 var LayerDefs = {
     "brewmap_industry": {
@@ -69,6 +69,7 @@ function load_brewmap_data() {
 	    bound_loadDataSuccess(layerName)
 	);
     }
+    showStatistics();
 }
 
 function bound_loadDataSuccess(layerName) {
@@ -76,9 +77,9 @@ function bound_loadDataSuccess(layerName) {
     // passes the layer name as a parameter - it is made to call loadDataSuccess().
     // 12Nov2011 Craig Loftus
     //
-	return function(data) {
-		loadDataSuccess(data, layerName);
-	};
+    return function(data) {
+	loadDataSuccess(data, layerName);
+    };
 }
 
 /* 
@@ -127,8 +128,43 @@ function loadDataSuccess(dataObj,layerName) {
 	} 
 	  
     }
+    addStatistics(layerName,dataObj);
 }
 
+function showStatistics() {
+    //alert("stats="+statistics);
+    for (var ln in statistics) {
+	//alert("stats["+ln+"] = "+statistics[ln]);
+    }
+    var htmlStr = "<h2>Statistics</h2><ul>"
+    jQuery('#stats').html(htmlStr);
+    for (var layerName in LayerDefs) {
+	//alert("stats: "+layerName+" nWay="+statistics[layerName]['nWay']);
+	//alert("layerName="+layerName+": Stats="+statistics[layerName]);
+	//htmlStr += "<li>"+layerName+": Nodes = "+statistics[layerName]['nNode']+"</li>";
+	//htmlStr += "<li>"+layerName+": Ways  = "+statistics[layerName]['nWay']+"</li>";
+    }    
+    jQuery('#stats').html(htmlStr);
+}
+
+
+function addStatistics(layerName,dataObj) {
+    //alert("addStatistics "+layerName);
+    var nWay = 0;
+    var nNode = 0;
+
+    for (entity in dataObj) {
+	if (entity != 'layerName') {
+	    //alert("layerName="+layerName+", entity="+entity);
+	    if (dataObj[entity]['type'] == 'node') { nNode++; }
+	    if (dataObj[entity]['type'] == 'way') { nWay++; }
+	}
+    }
+    statistics[layerName] = {}
+    statistics[layerName]['nWay'] = nWay;
+    statistics[layerName]['nNode'] = nNode;
+    //alert("stats: "+layerName+" nWay="+statistics[layerName]['nWay']);
+}
 
 function initialise_brewmap() {
     // Set the URL of the source of data for the map (../server)

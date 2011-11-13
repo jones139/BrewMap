@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OSM Brew Map - Tag Queries</title>
+    <meta charset="utf-8" />
+    
+  </head>
+  <body>
+    <h2>OSM Brew Map Tag Queries</h2>
+    <p>Map data (c) OpenStreetMap contributors, CC-BY-SA.  
+    For more information please see <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries"> the OpenStreetMap Wiki page</a>.</p>
+    <div id="table">
+    </div>
+
+   <script src="js/jquery-1.7.min.js"></script>
+   <script src="js/tagQuery.js"></script>
+    <script>
+      $(document).ready(function(){
+          initialise_tagQuery();
+      });
+    </script>
+  </body>
+</html>

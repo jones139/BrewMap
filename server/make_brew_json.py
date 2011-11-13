@@ -118,8 +118,26 @@ def make_brew_json(options):
     industry.update(industry_poly)
     industry.update(industry_point)
 
-    # Write the files to disk
+    # Tagging Queries (things that may be breweries, but not tagged
+    # as per our schema.
+    sqlWhereStr = " where name ilike('%brewery%')" \
+        " and (disused is null or disused != 'yes')" \
+        " and (industry is null or industry != 'brewery')" \
+        " and (craft is null or craft != 'brewery')"
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPointStr,sqlWhereStr)
+    tagQuery_point = query2obj(sqlStr,options)
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPolygonStr,sqlWhereStr)
+    tagQuery_poly = query2obj(sqlStr,options)
 
+    tagQuery = {'layerName':'tagQuery'}
+    tagQuery.update(tagQuery_poly)
+    tagQuery.update(tagQuery_point)
+
+    ##################################################################
+    # Write the files to disk
+    ##################################################################
     outfile = open("%s_microbrewery.json" % options.outfile,"w")
     outfile.write(json.dumps(microbrewery))
     outfile.close()
@@ -128,6 +146,9 @@ def make_brew_json(options):
     outfile.close()
     outfile = open("%s_industry.json" % options.outfile,"w")
     outfile.write(json.dumps(industry))
+    outfile.close()
+    outfile = open("%s_tagQuery.json" % options.outfile,"w")
+    outfile.write(json.dumps(tagQuery))
     outfile.close()
 
 
