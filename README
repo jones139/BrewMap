@@ -13,7 +13,7 @@ The data is saved as a simple json file that can be downloaded by the client cod
 
 The client code should run in any modern browser.  It downloads the json data prepared by the data using jQuery, parses it, and displays it on a map using the Leaflet library.
 
-The development version of this code can be seen running at http://maps.webhop.net/BrewMap/client/brewmap.html
+The development version of this code can be seen running at http://brewmap.maps3.org.uk
 
 Dependencies
 ============
@@ -25,6 +25,8 @@ Contributors
 The code in this repository includes jQuery (http://jquery.org) and Leaflet (http://leaflet.cloudmade.com)
 
 The factory image is from http://www.freeiconsweb.com/Free-Downloads.asp?id=1291
+
+Craig Loftus helped sort out my problems with javascript variable scope in the client.
 
 
 Licence
