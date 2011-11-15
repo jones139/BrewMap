@@ -87,24 +87,27 @@ function bound_loadDataSuccess(layerName) {
  * DESC: This function is called when a brewery datafile is successfully downloaded by the server.
  *       Download is initiated from the load_brewmap_data() function.
  *       It parses the file to create the map objects for display.
- * HIST: 12nov2011  GJ  ORIGINAL VERSION
+ * HIST: 12Nov2011  GJ  ORIGINAL VERSION
+ * 	 15Nov2011 Craig Loftus Moved pop-up content out
  */
 function loadDataSuccess(dataObj,layerName) {
     
-    //alert('Loaded layer '+layerName);
-
     for (entity in dataObj) {
 	if (entity != 'layerName') {
-	    var posN = new L.LatLng(dataObj[entity]['point']['lat'],
-				   dataObj[entity]['point']['lng']);
-	    var brewType = 'microbrewery';
+
+	    // Local cache to reduce searching
+	    var entity_obj = dataObj[entity];
+	    // Storing id in object for use in pop-up
+	    entity_obj.id = entity;
+	    // Keeping all the info about the entity together
+	    entity_obj.brew_type = 'microbrewery';
 	    var markerFillColour = 'yellow';
-	    if (dataObj[entity]['industry']=="brewery") {
-		brewType = 'industrial';
+	    if (entity_obj['industry']=="brewery") {
+		entity_obj.brew_type = 'industrial';
 		markerFillColour = 'blue';
 	    }
-	    if (dataObj[entity]['craft']=="brewery") {
-		brewType = 'craft';
+	    if (entity_obj['craft']=="brewery") {
+		entity_obj.brew_type = 'craft';
 		markerFillColour = 'green';
 	    }
 	    //var marker = new L.Marker(posN);
@@ -112,23 +115,61 @@ function loadDataSuccess(dataObj,layerName) {
 	    //				    {color:markerFillColour,
 	    //				     fillColor:markerFillColour,
 	    //				     fillOpacity:0.5});
+	    
+	    var posN = new L.LatLng(entity_obj['point']['lat'],
+				   entity_obj['point']['lng']);
+
 	    var marker = new L.Marker(posN, {icon: LayerDefs[layerName]['icon']});
-	    marker.bindPopup("<ul>"
-			     +"<li><b>Name: "+ dataObj[entity]['name']+"</b></li>"
-			     +"<li>Type:"+brewType+"</li>"
-			     +"<li>Address:"+dataObj[entity]['addr:housename']+","
-			     +dataObj[entity]['addr:housename']+"</li>"
-			     +"<li>WebSite:Not Working Yet!"+"</li>"
-			     +"<li>OSM Link: "+"<a href='http://www.openstreetmap.org/browse/"+
-			     dataObj[entity]['type']+"/"+
-			     entity+"' target='_blank'>browse</a></li>"
-			     +"</ul>");
+	    marker.bindPopup(popup.content(entity_obj));
 	    map.addLayer(marker);
-	    //alert("adding "+dataObj[entity]['name']);
 	} 
-	  
     }
     addStatistics(layerName,dataObj);
+}
+
+/*
+ * NAME: popup
+ * DESC: Object that provides functions for generating pop-up content
+ * HIST: 15Nov2011 Craig Loftus ORIGINAL VERSION
+ */
+var popup = {
+	/*
+	 * NAME: popup.item(key,value)
+	 * DESC: Produces a list item formatted as a key value pair
+	 * HIST: 15Nov2011 Craig Loftus ORIGINAL VERSION
+	 */
+	item: function(key_str,value_str) {
+		// Using [].join() because it is quicker than concat.
+		return this.output.push(["<li><strong>",key_str,":</strong> ",
+			value_str,"</li>"].join(''));
+	},
+	/*
+	 * NAME: popup.content(entity_obj)
+	 * DESC: Produces html for pop-up given an object containing all the
+	 *       info on an entity
+	 * HIST: 15Nov2011 Craig Loftus ORIGINAL VERSION
+	 */
+	content: function(entity_obj) {
+		// Defined in object context (this) for use by other methods
+		this.output = ['<ul>'];
+
+		this.item("Name",entity_obj['name']);
+		this.item("Type",entity_obj['brew_type']);
+		this.item("Address",[entity_obj['addr:housename'],',',
+			entity_obj['addr:housename']].join(''));
+		
+		// Local cache to reduce searching
+		var output = this.output;
+		output.push("</ul>");
+
+		output.push(['<p class="edit"><a href="http://www.openstreetmap.org/browse/',
+			entity_obj['type'],'/',
+			entity_obj['id'],
+			'" target="_blank">Browse data</a></p>'].join(''));
+		output.push('<p class="website"><a href="http://not.working.yet" rel="nofollow">http://not.working.yet</a></p>');
+		
+		return output.join('');
+	}
 }
 
 function showStatistics() {
