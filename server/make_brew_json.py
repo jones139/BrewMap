@@ -118,6 +118,21 @@ def make_brew_json(options):
     industry.update(industry_poly)
     industry.update(industry_point)
 
+    # Pubs Breweries
+    sqlWhereStr = " where amenity = 'pub'" \
+        " and (disused is null or disused != 'yes')"
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPointStr,sqlWhereStr)
+    pub_point = query2obj(sqlStr,options)
+    sqlStr = "%s %s %s" % \
+        (sqlSelectStr, sqlSelectPolygonStr,sqlWhereStr)
+    pub_poly = query2obj(sqlStr,options)
+
+
+    pub = {'layerName':'brewmap_pub'}
+    pub.update(pub_poly)
+    pub.update(pub_point)
+
     # Tagging Queries (things that may be breweries, but not tagged
     # as per our schema.
     sqlWhereStr = " where name ilike('%brewery%')" \
@@ -149,6 +164,9 @@ def make_brew_json(options):
     outfile.close()
     outfile = open("%s_industry.json" % options.outfile,"w")
     outfile.write(json.dumps(industry))
+    outfile.close()
+    outfile = open("%s_pub.json" % options.outfile,"w")
+    outfile.write(json.dumps(pub))
     outfile.close()
     outfile = open("%s_tagQuery.json" % options.outfile,"w")
     outfile.write(json.dumps(tagQuery))
