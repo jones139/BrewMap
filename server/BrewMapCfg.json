@@ -1,6 +1,7 @@
 {	
-"layerDefs":{
-   "layerGroup": {
+"layerGroups":{
+   "BrewMap": {
+      "title":"OSM UK Brew Map",
       "sqlSelectCol":"select osm_id,name,amenity,craft,industry,microbrewery",
       "sqlSelectPoint":"st_astext(st_transform(way,4326)) as way 'node' as type from planet_osm_point",
       "sqlSelectPolygon":"st_astext(st_transform(st_centroid(way),4326)) as way 'way' as type from planet_osm_polygon ",
