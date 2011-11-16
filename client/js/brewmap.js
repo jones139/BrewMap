@@ -27,11 +27,12 @@ var statistics = {};
 var layerDefs = {};
 
 function makeIcons() {
-// Create Leaflet Icons using the images specified in LayerDefs.
+// Create Leaflet Icons using the images specified in layerDefs.
 // The icon objects are added to LayrDefs.
-    for (var layerName in layerDefs['layerGroups'][layerGroup]) {
+    var layers = layerDefs['layerGroups'][layerGroup].layers;
+    for (var layerName in layers) {
 	alert("layerName="+layerName);
-	var iconURL = imageURL + "/" + LayerDefs[layerName]['iconImg']
+	var iconURL = imageURL + "/" + layers[layerName]['iconImg']
 	var iconType = L.Icon.extend({
 	    iconUrl: iconURL,
 	    shadowUrl: iconURL,
@@ -40,7 +41,7 @@ function makeIcons() {
 	    iconAnchor: new L.Point(12,12),
 	    popupAnchor: new L.Point(12,24)
 	});
-	LayerDefs[layerName]['icon'] = new iconType()
+	layers[layerName]['icon'] = new iconType()
     }
 }
 
@@ -60,18 +61,20 @@ function loadConfigSuccess(dataObj) {
     //      16nov2011  GJ  ORIGINAL VERSION
     alert("loadConfigSuccess - dataObj="+dataObj);
     layerDefs = dataObj;
+    load_brewmap_data();
 }
 
 function load_brewmap_data() {
-    loadConfigFile();
     makeIcons();
-    for (var layerName in LayerDefs) {
+
+    var layers = layerDefs['layerGroups'][layerGroup].layers;
+    for (var layerName in layers) {
 	//alert("Loading Layer "+layerName+", "+typeof(layerName));
 	// This loads the required file, and passes it to loadDataSuccess, along with an extra
 	// argument, layerName which is the name of the Layer just loaded, so that we only need one
 	// loadDataSuccess function, no matter how many files we need to load.
 	jQuery.getJSON(
-	    dataURL+LayerDefs[layerName]['dataFile'],
+	    dataURL+layers[layerName]['dataFile'],
 	    bound_loadDataSuccess(layerName)
 	);
     }
@@ -97,6 +100,8 @@ function bound_loadDataSuccess(layerName) {
  * 	 15Nov2011 Craig Loftus Moved pop-up content out
  */
 function loadDataSuccess(dataObj,layerName) {
+
+    var layer = layerDefs['layerGroups'][layerGroup].layers[layerName];
     
     for (entity in dataObj) {
 	if (entity != 'layerName') {
@@ -125,7 +130,7 @@ function loadDataSuccess(dataObj,layerName) {
 	    var posN = new L.LatLng(entity_obj['point']['lat'],
 				   entity_obj['point']['lng']);
 
-	    var marker = new L.Marker(posN, {icon: LayerDefs[layerName]['icon']});
+	    var marker = new L.Marker(posN, {icon: layer['icon']});
 	    marker.bindPopup(popup.content(entity_obj));
 	    map.addLayer(marker);
 	} 
@@ -185,7 +190,7 @@ function showStatistics() {
     }
     var htmlStr = "<h2>Statistics</h2><ul>"
     jQuery('#stats').html(htmlStr);
-    for (var layerName in LayerDefs) {
+    for (var layerName in layerDefs) {
 	//alert("stats: "+layerName+" nWay="+statistics[layerName]['nWay']);
 	//alert("layerName="+layerName+": Stats="+statistics[layerName]);
 	//htmlStr += "<li>"+layerName+": Nodes = "+statistics[layerName]['nNode']+"</li>";
@@ -254,6 +259,5 @@ function initialise_brewmap() {
     jQuery('#editButton').click(editButtonCallback);
 
     // Add the brewery information to the map
-    load_brewmap_data();
-
+    loadConfigFile();
 }
