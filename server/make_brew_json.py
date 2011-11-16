@@ -20,6 +20,7 @@
 import psycopg2 as psycopg2
 import psycopg2.extras
 import json
+from pprint import pprint
 
 def query2obj(sqlstr,options):
     """
@@ -53,6 +54,25 @@ def query2obj(sqlstr,options):
     return microbreweries
 
 
+def deleteNullEntries(obj):
+    """Delete entries from an object obj that are 'None'
+    Recursively scans through obj for objects with obj.
+    Non-object entities are checked and if they are not None, they are
+    written to the output object, which is returned.
+    NOTE:  This will probably not work problem for lists, but works for 
+    objects within objects.
+    
+    HIST:
+    16nov2011 GJ  ORIGINAL VERSION
+    """
+    op = {}
+    for nameStr in obj:
+        if type(obj[nameStr]).__name__=='dict':
+            op[nameStr] = deleteNullEntries(obj[nameStr])
+        elif  obj[nameStr]!=None:
+            op[nameStr]=obj[nameStr]
+    return op
+    
 
 def make_brew_json(options):
     """
@@ -89,6 +109,7 @@ def make_brew_json(options):
     microbrewery = {'layerName':'brewmap_microbrewery'}
     microbrewery.update(microbrewery_poly)
     microbrewery.update(microbrewery_point)
+    microbrewery = deleteNullEntries(microbrewery)
 
     # Craft Breweries
     sqlWhereStr = " where craft = 'brewery'" \
@@ -103,6 +124,11 @@ def make_brew_json(options):
     craft = {'layerName':'brewmap_craft'}
     craft.update(craft_poly)
     craft.update(craft_point)
+    print "input"
+    pprint(craft)
+    craft = deleteNullEntries(craft)
+    print "output"
+    pprint(craft)
 
     # Industrial Breweries
     sqlWhereStr = " where industry = 'brewery'" \
@@ -117,6 +143,12 @@ def make_brew_json(options):
     industry = {'layerName':'brewmap_industry'}
     industry.update(industry_poly)
     industry.update(industry_point)
+    print "input"
+    pprint(industry)
+    industry = deleteNullEntries(industry)
+    print "output"
+    pprint(industry)
+    #deleteNullEntries(industry)
 
     # Pubs Breweries
     sqlWhereStr = " where amenity = 'pub'" \
@@ -132,6 +164,7 @@ def make_brew_json(options):
     pub = {'layerName':'brewmap_pub'}
     pub.update(pub_poly)
     pub.update(pub_point)
+    pub = deleteNullEntries(pub)
 
     # Tagging Queries (things that may be breweries, but not tagged
     # as per our schema.
@@ -152,7 +185,7 @@ def make_brew_json(options):
     tagQuery = {}
     tagQuery.update(tagQuery_poly)
     tagQuery.update(tagQuery_point)
-
+    tagQuery = deleteNullEntries(tagQuery)
     ##################################################################
     # Write the files to disk
     ##################################################################

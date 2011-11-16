@@ -31,7 +31,7 @@ function makeIcons() {
 // The icon objects are added to LayrDefs.
     var layers = layerDefs['layerGroups'][layerGroup].layers;
     for (var layerName in layers) {
-	alert("layerName="+layerName);
+	//alert("layerName="+layerName);
 	var iconURL = imageURL + "/" + layers[layerName]['iconImg']
 	var iconType = L.Icon.extend({
 	    iconUrl: iconURL,
@@ -59,7 +59,7 @@ function loadConfigSuccess(dataObj) {
     // functions.
     // HIST:
     //      16nov2011  GJ  ORIGINAL VERSION
-    alert("loadConfigSuccess - dataObj="+dataObj);
+    //alert("loadConfigSuccess - dataObj="+dataObj);
     layerDefs = dataObj;
     load_brewmap_data();
 }
@@ -70,8 +70,10 @@ function load_brewmap_data() {
     var layers = layerDefs['layerGroups'][layerGroup].layers;
     for (var layerName in layers) {
 	//alert("Loading Layer "+layerName+", "+typeof(layerName));
-	// This loads the required file, and passes it to loadDataSuccess, along with an extra
-	// argument, layerName which is the name of the Layer just loaded, so that we only need one
+	// This loads the required file, and passes it to 
+	// loadDataSuccess, along with an extra
+	// argument, layerName which is the name of the Layer 
+	// just loaded, so that we only need one
 	// loadDataSuccess function, no matter how many files we need to load.
 	jQuery.getJSON(
 	    dataURL+layers[layerName]['dataFile'],
@@ -82,8 +84,10 @@ function load_brewmap_data() {
 }
 
 function bound_loadDataSuccess(layerName) {
-    // This function is used by load_brewmap_data to create a callback function that
-    // passes the layer name as a parameter - it is made to call loadDataSuccess().
+    // This function is used by load_brewmap_data to create a
+    // callback function that
+    // passes the layer name as a parameter - it is made to call 
+    // loadDataSuccess().
     // 12Nov2011 Craig Loftus
     //
     return function(data) {
@@ -93,7 +97,8 @@ function bound_loadDataSuccess(layerName) {
 
 /* 
  * NAME: loadDataSuccess(data,statusText)
- * DESC: This function is called when a brewery datafile is successfully downloaded by the server.
+ * DESC: This function is called when a brewery datafile is successfully 
+ *       downloaded by the server.
  *       Download is initiated from the load_brewmap_data() function.
  *       It parses the file to create the map objects for display.
  * HIST: 12Nov2011  GJ  ORIGINAL VERSION
