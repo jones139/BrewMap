@@ -18,33 +18,19 @@
 //
 ////////////////////////////////////////////////////////////////////////
 // Define Global Variables
+var configFname = "BrewMapCfg.json";
+var layerGroup = "BrewMap";
 var dataURL;
 var imageURL;
 var map;
 var statistics = {};
-
-
-var LayerDefs = {
-    "brewmap_industry": {
-	"dataFile": "brewmap_industry.json",
-	"iconImg": "factory.png"
-    },
-    "brewmap_craft": {
-	"dataFile": "brewmap_craft.json",
-	"iconImg": "house.png"
-    },
-
-    "brewmap_microbrewery": {
-	"dataFile": "brewmap_microbrewery.json",
-	"iconImg": "drink.png"
-    }
-
-};
+var layerDefs = {};
 
 function makeIcons() {
 // Create Leaflet Icons using the images specified in LayerDefs.
 // The icon objects are added to LayrDefs.
-    for (var layerName in LayerDefs) {
+    for (var layerName in layerDefs['layerGroups'][layerGroup]) {
+	alert("layerName="+layerName);
 	var iconURL = imageURL + "/" + LayerDefs[layerName]['iconImg']
 	var iconType = L.Icon.extend({
 	    iconUrl: iconURL,
@@ -58,7 +44,27 @@ function makeIcons() {
     }
 }
 
+
+function loadConfigFile() {
+    jQuery.getJSON(
+		   dataURL+configFname,
+		   loadConfigSuccess
+		   );
+}
+
+function loadConfigSuccess(dataObj) {
+    // Parses the downloaded configuration file object
+    // and loads its content into global variables for use by other
+    // functions.
+    // HIST:
+    //      16nov2011  GJ  ORIGINAL VERSION
+    alert("loadConfigSuccess - dataObj="+dataObj);
+    layerDefs = dataObj;
+}
+
 function load_brewmap_data() {
+    loadConfigFile();
+    makeIcons();
     for (var layerName in LayerDefs) {
 	//alert("Loading Layer "+layerName+", "+typeof(layerName));
 	// This loads the required file, and passes it to loadDataSuccess, along with an extra
@@ -248,7 +254,6 @@ function initialise_brewmap() {
     jQuery('#editButton').click(editButtonCallback);
 
     // Add the brewery information to the map
-    makeIcons();
     load_brewmap_data();
 
 }
