@@ -23,7 +23,6 @@ var layerGroup = "BrewMap";
 var dataURL;
 var imageURL;
 var map;
-var statistics = {};
 var layerDefs = {};
 
 function makeIcons() {
@@ -80,7 +79,6 @@ function load_brewmap_data() {
 	    bound_loadDataSuccess(layerName)
 	);
     }
-    showStatistics();
 }
 
 function bound_loadDataSuccess(layerName) {
@@ -180,39 +178,32 @@ var popup = {
 	}
 }
 
-function showStatistics() {
-    //alert("stats="+statistics);
-    for (var ln in statistics) {
-	//alert("stats["+ln+"] = "+statistics[ln]);
-    }
-    var htmlStr = "<h2>Statistics</h2><ul>"
-    jQuery('#stats').html(htmlStr);
-    for (var layerName in layerDefs) {
-	//alert("stats: "+layerName+" nWay="+statistics[layerName]['nWay']);
-	//alert("layerName="+layerName+": Stats="+statistics[layerName]);
-	//htmlStr += "<li>"+layerName+": Nodes = "+statistics[layerName]['nNode']+"</li>";
-	//htmlStr += "<li>"+layerName+": Ways  = "+statistics[layerName]['nWay']+"</li>";
-    }    
-    jQuery('#stats').html(htmlStr);
+function updateStatistics(layerName, layerStats) {
+	$('#stats ul').append(["<li>", layerName, ": Nodes = ",
+	layerStats.nNode, "</li>","\n<li>", layerName, ": Ways  = ",
+	layerStats.nWay, "</li>"].join(''));
 }
 
-
 function addStatistics(layerName,dataObj) {
-    //alert("addStatistics "+layerName);
+    var layerStatistics ={};
     var nWay = 0;
     var nNode = 0;
 
     for (entity in dataObj) {
 	if (entity != 'layerName') {
-	    //alert("layerName="+layerName+", entity="+entity);
-	    if (dataObj[entity]['type'] == 'node') { nNode++; }
-	    if (dataObj[entity]['type'] == 'way') { nWay++; }
+	    if (dataObj[entity].type === 'node') {
+	        nNode=nNode+1;
+	    }
+	    if (dataObj[entity].type === 'way') {
+	        nWay=nWay+1;
+	    }
 	}
     }
-    statistics[layerName] = {}
-    statistics[layerName]['nWay'] = nWay;
-    statistics[layerName]['nNode'] = nNode;
-    //alert("stats: "+layerName+" nWay="+statistics[layerName]['nWay']);
+
+    layerStatistics.nWay = nWay;
+    layerStatistics.nNode = nNode;
+
+    updateStatistics(layerName, layerStatistics);
 }
 
 function editButtonCallback() {
