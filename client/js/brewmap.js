@@ -32,7 +32,7 @@ function makeIcons() {
     var layers = layerDefs['layerGroups'][layerGroup].layers;
     for (var layerName in layers) {
 	//alert("layerName="+layerName);
-	var iconURL = imageURL + "/" + layers[layerName]['iconImg']
+	var iconURL = imageURL + "/" + layers[layerName]['iconImg'];
 	var iconType = L.Icon.extend({
 	    iconUrl: iconURL,
 	    shadowUrl: iconURL,
@@ -41,7 +41,7 @@ function makeIcons() {
 	    iconAnchor: new L.Point(12,12),
 	    popupAnchor: new L.Point(12,24)
 	});
-	layers[layerName]['icon'] = new iconType()
+	layers[layerName]['icon'] = new iconType();
     }
 }
 
@@ -117,20 +117,12 @@ function loadDataSuccess(dataObj,layerName) {
 	    entity_obj.id = entity;
 	    // Keeping all the info about the entity together
 	    entity_obj.brew_type = 'microbrewery';
-	    var markerFillColour = 'yellow';
 	    if (entity_obj['industry']=="brewery") {
 		entity_obj.brew_type = 'industrial';
-		markerFillColour = 'blue';
 	    }
 	    if (entity_obj['craft']=="brewery") {
 		entity_obj.brew_type = 'craft';
-		markerFillColour = 'green';
 	    }
-	    //var marker = new L.Marker(posN);
-	    //var marker = new L.CircleMarker(posN,
-	    //				    {color:markerFillColour,
-	    //				     fillColor:markerFillColour,
-	    //				     fillOpacity:0.5});
 	    
 	    var posN = new L.LatLng(entity_obj['point']['lat'],
 				   entity_obj['point']['lng']);
