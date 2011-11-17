@@ -179,13 +179,14 @@ var popup = {
 }
 
 function updateStatistics(layerName, layerStats) {
+	// Using append to progressively add to existing content
 	$('#stats ul').append(["<li>", layerName, ": Nodes = ",
 	layerStats.nNode, "</li>","\n<li>", layerName, ": Ways  = ",
 	layerStats.nWay, "</li>"].join(''));
 }
 
 function addStatistics(layerName,dataObj) {
-    var layerStatistics ={};
+    var layerStatistics = {};
     var nWay = 0;
     var nNode = 0;
 
@@ -203,6 +204,7 @@ function addStatistics(layerName,dataObj) {
     layerStatistics.nWay = nWay;
     layerStatistics.nNode = nNode;
 
+    // Calling update to add new stats for this layer
     updateStatistics(layerName, layerStatistics);
 }
 
