@@ -124,11 +124,11 @@ def make_brew_json(options):
     craft = {'layerName':'brewmap_craft'}
     craft.update(craft_poly)
     craft.update(craft_point)
-    print "input"
-    pprint(craft)
+    #print "input"
+    #pprint(craft)
     craft = deleteNullEntries(craft)
-    print "output"
-    pprint(craft)
+    #print "output"
+    #pprint(craft)
 
     # Industrial Breweries
     sqlWhereStr = " where industry = 'brewery'" \
@@ -143,11 +143,11 @@ def make_brew_json(options):
     industry = {'layerName':'brewmap_industry'}
     industry.update(industry_poly)
     industry.update(industry_point)
-    print "input"
-    pprint(industry)
+    #print "input"
+    #pprint(industry)
     industry = deleteNullEntries(industry)
-    print "output"
-    pprint(industry)
+    #print "output"
+    #pprint(industry)
     #deleteNullEntries(industry)
 
     # Pubs Breweries
