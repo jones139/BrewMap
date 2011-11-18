@@ -18,7 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 // Define Global Variables
-var configFname = "BrewMapCfg.json";
+var configFname = "BrewMap.cfg";
 var layerGroup = "BrewMap";
 var dataURL;
 var imageURL;

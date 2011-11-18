@@ -206,6 +206,64 @@ def make_brew_json(options):
     outfile.close()
 
 
+def make_json(options,seto):
+    """
+    makes the json files specified in the settings object seto.
+    """
+    if options.debug: print "make_json"
+    # Loop through each layer group
+    for lg in seto['layerGroups']:
+        layerGroup = seto['layerGroups'][lg]
+        sqlSelectCol = layerGroup['sqlSelectCol']
+        sqlSelectPoint = layerGroup['sqlSelectPoint']
+        sqlSelectPolygon = layerGroup['sqlSelectPolygon']
+        sqlTagQueries = layerGroup['sqlTagQueries']
+        tagQueriesDataFile = layerGroup['tagQueriesDataFile']
+        # Loop through each layer within the group
+        for layerStr in layerGroup['layers']:
+            if options.debug: print "Layer = %s:" % layerStr
+            layer = layerGroup['layers'][layerStr]
+            if options.debug: pprint(layer)
+            sqlWhere = layer['sqlWhere']
+            dataFile = layer['dataFile']
+            # Extract data from the points table
+            sqlStr = "%s, %s %s" % \
+                (sqlSelectCol, sqlSelectPoint,sqlWhere)
+            if options.debug: print sqlStr
+            pointObj = query2obj(sqlStr,options)
+            # Extract data from the polygons table
+            sqlStr = "%s, %s %s" % \
+                (sqlSelectCol, sqlSelectPolygon,sqlWhere)
+            if options.debug: print sqlStr
+            polyObj = query2obj(sqlStr,options)
+            # Merge the point and polygon data
+            retObj = {}
+            retObj.update(pointObj)
+            retObj.update(polyObj)
+            retObj = deleteNullEntries(retObj)
+            # Write it to disk
+            outfile = open("%s" % dataFile,"w")
+            outfile.write(json.dumps(retObj))
+            outfile.close()
+
+        ##########################################################
+        # Now calculate the tagQueries.json file.
+        sqlStr = "%s, %s %s" % \
+            (sqlSelectCol, sqlSelectPoint,sqlTagQueries)
+        tagQuery_point = query2obj(sqlStr,options)
+        sqlStr = "%s, %s %s" % \
+            (sqlSelectCol, sqlSelectPolygon,sqlTagQueries)
+        tagQuery_poly = query2obj(sqlStr,options)
+
+        tagQuery = {}
+        tagQuery.update(tagQuery_poly)
+        tagQuery.update(tagQuery_point)
+        tagQuery = deleteNullEntries(tagQuery)
+        outfile = open(tagQueriesDataFile,"w")
+        outfile.write(json.dumps(retObj))
+        outfile.close()
+
+
 # INIT ----------------------------------------------------------
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -215,6 +273,9 @@ if __name__ == "__main__":
     parser = OptionParser(usage=usage,version=version)
     parser.add_option("-f", "--file", dest="outfile",
                       help="filename to use for output",
+                      metavar="FILE")
+    parser.add_option("-c", "--config", dest="configFile",
+                      help="Configuration File Name",
                       metavar="FILE")
     parser.add_option("-n", "--dbname", dest="dbname",
                       help="database name")
@@ -227,6 +288,7 @@ if __name__ == "__main__":
     parser.add_option("-d", "--debug", action="store_true",dest="debug",
                       help="Include debug output")
     parser.set_defaults(
+        configFile = "BrewMap.cfg",
         outfile = "brewmap",
         dbname = "osm_gb",
         dbuname = "graham",
@@ -240,9 +302,23 @@ if __name__ == "__main__":
         print "options   = %s" % options
         print "arguments = %s" % args
 
+    try:
+        settingsFile=open(options.configFile)
+        settingsJSON = settingsFile.read()
+    except:
+        print "Error Reading Configuration File: %s.\n" % options.configFile
 
-    make_brew_json(options)
-    
+    try:
+        seto = json.loads(settingsJSON)
+    except:
+        print "oh no - there is an error in the configuration file: %s.\n" %\
+            options.configFile
+        if options.debug:
+            print sys.exc_info()[0]
+            raise
+
+    #make_brew_json(options)
+    make_json(options,seto)
 
 
 
