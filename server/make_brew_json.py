@@ -129,7 +129,7 @@ def make_json(options,seto):
         tagQuery.update(tagQuery_point)
         tagQuery = deleteNullEntries(tagQuery)
         outfile = open(tagQueriesDataFile,"w")
-        outfile.write(json.dumps(retObj))
+        outfile.write(json.dumps(tagQuery))
         outfile.close()
 
 
