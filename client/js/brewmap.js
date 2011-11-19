@@ -35,10 +35,10 @@ function makeIcons() {
 	var iconType = L.Icon.extend({
 	    iconUrl: iconURL,
 	    shadowUrl: iconURL,
-	    iconSize: new L.Point(24,24),
-	    shadowSize: new L.Point(24,24),
-	    iconAnchor: new L.Point(12,12),
-	    popupAnchor: new L.Point(12,24)
+	    iconSize: new L.Point(16,16),
+	    shadowSize: new L.Point(16,16),
+	    iconAnchor: new L.Point(8,8),
+	    popupAnchor: new L.Point(8,24)
 	});
 	layers[layerName]['icon'] = new iconType();
     }
