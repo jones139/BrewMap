@@ -137,7 +137,7 @@ function loadDataSuccess(dataObj,layerName) {
 	    map.addLayer(marker);
 	} 
     }
-    addStatistics(layerName,dataObj);
+    addStatistics(layer['label'],dataObj);
 }
 
 /*
@@ -202,9 +202,10 @@ var popup = {
 
 function updateStatistics(layerName, layerStats) {
 	// Using append to progressively add to existing content
-	$('#stats ul').append(["<li>", layerName, ": Nodes = ",
-	layerStats.nNode, "</li>","\n<li>", layerName, ": Ways  = ",
-	layerStats.nWay, "</li>"].join(''));
+	$('#stats table').append(["<tr><td>", layerName, "</td><td>",
+				  layerStats.nNode, "</td><td>",layerStats.nWay, "</td>",
+				  "<td>",layerStats.nNode+layerStats.nWay,
+				  "</td></tr>"].join(''));
 }
 
 function addStatistics(layerName,dataObj) {
