@@ -18,6 +18,12 @@
 //
 ////////////////////////////////////////////////////////////////////////
 // Define Global Variables
+// Note: these may be overriden by values specified as GET parameters.
+// lat,lon and zoom are only global so that they appear at the top of the
+// file to make the default values easy to change.
+var lat = 54.505;
+var lon = -2.0;
+var zoom = 5;
 var configFname = "BrewMap.cfg";
 var layerGroup = "BrewMap";
 var dataURL;
@@ -239,6 +245,20 @@ function editButtonCallback() {
     
 }
 
+function updatePermaLink() {
+    // update the permalink on the main map page based on the current map
+    // state.
+    var centrePt = map.getCenter();
+    var curLat = centrePt.lat;
+    var curLon = centrePt.lng;
+    var curZoom = map.getZoom();
+    var pageURL = document.location.href.split('?')[0];
+    var hrefURL = pageURL + '?lon='+curLon+'&lat='+curLat+'&z='+curZoom;
+    jQuery('#permaLink').attr('href',hrefURL);
+    
+}
+
+
 function initialise_brewmap() {
     // Set the URL of the source of data for the map (../server)
     // Thanks to http://programmingsolution.net/post/
@@ -254,16 +274,41 @@ function initialise_brewmap() {
     URLParts[URLParts.length - 1] = 'images';
     imageURL = URLParts.join('/');
 
+
+    //Now read any GET variariables from the URL (to use for permalinks etc.)
+    //These are used to set up the initial state of the map.
+    var urlVars = getUrlVars();
+    if ('lat' in urlVars) {
+	lat = parseFloat(urlVars['lat']);
+    } 
+    if ('lon' in urlVars) {
+	lon = parseFloat(urlVars['lon']);
+    } 
+    if ('z' in urlVars) {
+	zoom = parseFloat(urlVars['z']);
+    } 
+    if ('layerGroup' in urlVars) {
+	layerGroup = parseFloat(urlVars['layerGroup']);
+    } 
+    if ('configFname' in urlVars) {
+	configFname = parseFloat(urlVars['configFname']);
+    } 
+
+    //alert("Initial Map Position is ("+lon+","+lat+"), z="+zoom);
+
     // Initialise the map object
     map = new L.Map('map');
     var osmURL = 'http://tile.openstreetmap.org/{z}/{x}/{y}.png';
     var osmLayer = new L.TileLayer(osmURL,{maxZoom:18});
     map.addLayer(osmLayer);
-    map.setView(new L.LatLng(54.505, -2), 5);
+    map.setView(new L.LatLng(lat,lon), zoom);
+    map.addEventListener('moveend',updatePermaLink);
+    map.addEventListener('zoomend',updatePermaLink);
     
     // Set up the Edit Button
     jQuery('#editButton').click(editButtonCallback);
 
-    // Add the brewery information to the map
+    // Add the icons to the map as defined in the configuration file
+    // in global variable configFname, using layer group layerGroup
     loadConfigFile();
 }
