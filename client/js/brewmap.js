@@ -113,14 +113,15 @@ function loadDataSuccess(dataObj,layerName) {
 	    var entity_obj = dataObj[entity];
 	    // Storing id in object for use in pop-up
 	    entity_obj.id = entity;
+	    entity_obj.brew_type = layer['label'];
 	    // Keeping all the info about the entity together
-	    entity_obj.brew_type = 'microbrewery';
-	    if (entity_obj['industry']=="brewery") {
-		entity_obj.brew_type = 'industrial';
-	    }
-	    if (entity_obj['craft']=="brewery") {
-		entity_obj.brew_type = 'craft';
-	    }
+	    //entity_obj.brew_type = 'microbrewery';
+	    //if (entity_obj['industrial']=="brewery") {
+	    //entity_obj.brew_type = 'industrial';
+	    //}
+	    //if (entity_obj['craft']=="brewery") {
+	    //	entity_obj.brew_type = 'craft';
+	    //}
 	    
 	    var posN = new L.LatLng(entity_obj['point']['lat'],
 				   entity_obj['point']['lng']);
@@ -154,28 +155,37 @@ var popup = {
 	 * DESC: Produces html for pop-up given an object containing all the
 	 *       info on an entity
 	 * HIST: 15Nov2011 Craig Loftus ORIGINAL VERSION
+	 *       20nov2011 Graham Jones - got website working after database
+	 *                                update.
 	 */
-	content: function(entity_obj) {
-		// Defined in object context (this) for use by other methods
-		this.output = ['<ul>'];
-
-		this.item("Name",entity_obj['name']);
-		this.item("Type",entity_obj['brew_type']);
-		this.item("Address",[entity_obj['addr:housename'],',',
-			entity_obj['addr:housename']].join(''));
+    content: function(entity_obj) {
+	// Defined in object context (this) for use by other methods
+	this.output = ['<ul>'];
+	
+	this.item("Name",entity_obj['name']);
+	this.item("Type",entity_obj['brew_type']);
+	this.item("Address",[entity_obj['addr:housename'],',',
+			     entity_obj['addr:housenumber']].join(''));
+	this.item("Web Site",
+		  ['<a href=\"',
+		   entity_obj['website'],
+		   '\" target=\"_blank\">',
+		   entity_obj['website'],
+		   '</a>.'
+		  ].join(''));
+	
 		
-		// Local cache to reduce searching
-		var output = this.output;
-		output.push("</ul>");
-
-		output.push(['<p class="edit"><a href="http://www.openstreetmap.org/browse/',
-			entity_obj['type'],'/',
-			entity_obj['id'],
-			'" target="_blank">Browse data</a></p>'].join(''));
-		output.push('<p class="website"><a href="http://not.working.yet" rel="nofollow">http://not.working.yet</a></p>');
-		
-		return output.join('');
-	}
+	// Local cache to reduce searching
+	var output = this.output;
+	output.push("</ul>");
+	
+	output.push(['<p class="edit"><a href="http://www.openstreetmap.org/browse/',
+		     entity_obj['type'],'/',
+		     entity_obj['id'],
+		     '" target="_blank">Browse data</a></p>'].join(''));
+	//output.push('<p class="website"><a href="http://not.working.yet" rel="nofollow">http://not.working.yet</a></p>');	
+	return output.join('');
+    }
 }
 
 function updateStatistics(layerName, layerStats) {
