@@ -45,3 +45,8 @@ table, th, td {
     border: 1px solid black;
 }
 
+.details, .details h3{margin-bottom:0;}
+.address{margin-bottom:10px;}
+.details p{margin:0 !important; padding:0 !important;}
+.edit{color:gray; font-size:80%; margin-top:10px !important;}
+.edit a{color:gray !important;}
