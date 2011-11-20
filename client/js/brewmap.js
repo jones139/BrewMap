@@ -127,8 +127,19 @@ function loadDataSuccess(dataObj,layerName) {
 				   entity_obj['point']['lng']);
 
 	    var marker = new L.Marker(posN, {icon: layer['icon']});
+
+	    marker.brewmap = {};
+	    marker.brewmap.osm_id = entity_obj['osm_id'];
+	    marker.brewmap.type = entity_obj['type'];
+
 	    marker.bindPopup(popup.content(entity_obj));
+	    marker.on('click', function(e) {
+		address.target = e.target;
+		var data = e.target.brewmap;
+		address.search(data.osm_id, data.type);
+	    });
 	    map.addLayer(marker);
+	
 	} 
     }
     addStatistics(layerName,dataObj);
@@ -160,36 +171,40 @@ var popup = {
 	 */
     content: function(entity_obj) {
 	// Defined in object context (this) for use by other methods
-	this.output = ['<ul>'];
-	
-	this.item("Name",entity_obj['name']);
-	this.item("Type",entity_obj['brew_type']);
-	this.item("Address",[entity_obj['addr:housename'],',',
-			     entity_obj['addr:housenumber']].join(''));
-	this.item("Web Site",
-		  [
-		      '<a href=\"',
-		      entity_obj['website'],
-		      '\" target=\"_blank\">',
-		      entity_obj['website'],
-		      '</a> ',
-		      '<a href=\"',
-		      entity_obj['url'],
-		      '\" target=\"_blank\">',
-		      entity_obj['url'],
-		      '</a>'
-		  ].join(''));
-	
-		
-	// Local cache to reduce searching
+
+	this.output = [];
 	var output = this.output;
-	output.push("</ul>");
 	
-	output.push(['<p class="edit"><a href="http://www.openstreetmap.org/browse/',
-		     entity_obj['type'],'/',
-		     entity_obj['id'],
-		     '" target="_blank">Browse data</a></p>'].join(''));
-	//output.push('<p class="website"><a href="http://not.working.yet" rel="nofollow">http://not.working.yet</a></p>');	
+	output = ['<div class="details"><h3>',entity_obj.name,'</h3>'];	
+
+	output.push('<div class="address">');
+
+	output.push('</div>');
+
+	output.push('<strong>Type: </strong>',entity_obj['brew_type']);
+
+	var website = false;
+	if(entity_obj.website !== undefined)
+	{
+		website = entity_obj.website;
+	}
+	else if(entity_obj.url !== undefined)
+	{
+		website = entity_obj.url;
+	}
+	if(website !== false) {
+		output.push(['<p class="website"><a href=\"',website,
+		'\" target=\"_blank\">',website,'</a></p>'].join(''));
+	}
+
+	output.push(['<p class="edit">#<a href="http://www.openstreetmap.org/browse/',
+		entity_obj['type'],'/',
+		entity_obj['id'],
+		'" target="_blank">',
+		entity_obj['id'],'</a></p>'].join(''));
+
+	output.push('</div>');
+
 	return output.join('');
     }
 }
@@ -237,6 +252,64 @@ function editButtonCallback() {
     //alert(url);
     window.open(url);
     
+}
+
+var address = {
+	url: 'http://open.mapquestapi.com/nominatim/v1/reverse?',
+	search: function (id, type) {
+		this.id = id;
+		this.type = type;
+		this.make_query();
+		this.get();
+	},
+	make_query: function () {
+		var type_char;
+		switch (this.type) {
+			case 'node':
+				type_char = 'N';
+				break;
+			case 'way':
+				type_char = 'W';
+				break;
+			default:
+				console.log(type_char)
+				throw "Failed to match entity type";
+				return;
+		}
+		this.query = [this.url,'osm_id=',this.id,'&osm_type=',
+				type_char,'&format=json&json_callback=?'].join('');
+		console.log(this.query);
+	},
+	add: function(data) {
+		var name_arr = data.display_name.split(',');
+		var first_bits_arr = name_arr.slice(1,4);
+	
+		console.log(data);
+	
+		// Check for postcode
+		if(data.address.postcode !== undefined) {
+			first_bits_arr.push(data.address.postcode);
+		}
+		if(data.address.house_number !== undefined) {
+			if(data.address.house_number === first_bits_arr[0].trim()) {
+				var joined_num_and_st = first_bits_arr.splice(0,2).join(' ');
+				first_bits_arr.unshift(joined_num_and_st);
+			}
+		}
+
+		$(this.target._popup._contentNode).find('div.address')
+			.html(first_bits_arr.join(',<br />'));
+	},
+	get: function() {
+		var data = jQuery.getJSON(this.query, function(data) {
+			// Nominatim will set the error property
+			if(data.error !== undefined) {
+				console.log(data.error);
+				return false;
+			}
+			address.add(data);		
+		});
+	}	
 }
 
 function initialise_brewmap() {
