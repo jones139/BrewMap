@@ -167,11 +167,17 @@ var popup = {
 	this.item("Address",[entity_obj['addr:housename'],',',
 			     entity_obj['addr:housenumber']].join(''));
 	this.item("Web Site",
-		  ['<a href=\"',
-		   entity_obj['website'],
-		   '\" target=\"_blank\">',
-		   entity_obj['website'],
-		   '</a>.'
+		  [
+		      '<a href=\"',
+		      entity_obj['website'],
+		      '\" target=\"_blank\">',
+		      entity_obj['website'],
+		      '</a> ',
+		      '<a href=\"',
+		      entity_obj['url'],
+		      '\" target=\"_blank\">',
+		      entity_obj['url'],
+		      '</a>'
 		  ].join(''));
 	
 		
