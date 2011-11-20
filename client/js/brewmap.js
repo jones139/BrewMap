@@ -32,20 +32,21 @@ var map;
 var layerDefs = {};
 
 function makeIcons() {
-// Create Leaflet Icons using the images specified in layerDefs.
-// The icon objects are added to LayrDefs.
-    var layers = layerDefs['layerGroups'][layerGroup].layers;
-    for (var layerName in layers) {
+    // Create Leaflet Icons using the images specified in layerDefs.
+    // The icon objects are added to LayrDefs.
+    var layers, layerName, iconURL, iconType;
+    layers = layerDefs['layerGroups'][layerGroup].layers;
+    for (layerName in layers) {
 	//alert("layerName="+layerName);
-	var iconURL = imageURL + "/" + layers[layerName]['iconImg'];
-	var iconType = L.Icon.extend({
-	    iconUrl: iconURL,
-	    shadowUrl: iconURL,
-	    iconSize: new L.Point(16,16),
-	    shadowSize: new L.Point(16,16),
-	    iconAnchor: new L.Point(8,8),
-	    popupAnchor: new L.Point(8,24)
-	});
+	iconURL = imageURL + "/" + layers[layerName]['iconImg'];
+	iconType = L.Icon.extend({
+		iconUrl: iconURL,
+		shadowUrl: iconURL,
+		iconSize: new L.Point(16,16),
+		shadowSize: new L.Point(16,16),
+		iconAnchor: new L.Point(8,8),
+		popupAnchor: new L.Point(8,24)
+	    });
 	layers[layerName]['icon'] = new iconType();
     }
 }
