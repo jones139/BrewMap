@@ -138,6 +138,7 @@ function loadDataSuccess(dataObj,layerName) {
 	} 
     }
     addStatistics(layer['label'],dataObj);
+    addKey(layer['label'],layer['iconImg']);
 }
 
 /*
@@ -198,6 +199,17 @@ var popup = {
 	//output.push('<p class="website"><a href="http://not.working.yet" rel="nofollow">http://not.working.yet</a></p>');	
 	return output.join('');
     }
+};
+
+
+function addKey(layerName,iconImg) {
+    $('#key table').append(
+			   [
+			    '<tr><td>',
+			    layerName,
+			    '</td><td>',
+			    '<img src=\"images/',iconImg,'\" width=24>',
+			    '</td></tr>'].join(''));
 }
 
 function updateStatistics(layerName, layerStats) {
