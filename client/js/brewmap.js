@@ -21,15 +21,18 @@
 // Note: these may be overriden by values specified as GET parameters.
 // lat,lon and zoom are only global so that they appear at the top of the
 // file to make the default values easy to change.
-var lat = 54.505;
-var lon = -2.0;
-var zoom = 5;
-var configFname = "BrewMap.cfg";
-var layerGroup = "BrewMap";
-var dataURL;
-var imageURL;
-var map;
-var layerDefs = {};
+var lat = 54.505;                  // Initial latitude of centre of map.
+var lon = -2.0;                    // Initial longitude of centre of map.
+var zoom = 5;                      // Initial zoom level.
+var configFname = "BrewMap.cfg";   // Configuration file to use.
+var layerGroup = "BrewMap";        // The layerGroup to draw.
+//
+// Other Global Variables
+var dataURL;               // the base url to be used for map data downloads.
+var imageURL;              // the base url to be used for images.
+var map;                   // the map object
+var layerDefs = {};        // the icon layer definitions from the config. file.
+
 
 function makeIcons() {
     // Create Leaflet Icons using the images specified in layerDefs.
@@ -121,14 +124,6 @@ function loadDataSuccess(dataObj,layerName) {
 	    // Storing id in object for use in pop-up
 	    entity_obj.id = entity;
 	    entity_obj.brew_type = layer['label'];
-	    // Keeping all the info about the entity together
-	    //entity_obj.brew_type = 'microbrewery';
-	    //if (entity_obj['industrial']=="brewery") {
-	    //entity_obj.brew_type = 'industrial';
-	    //}
-	    //if (entity_obj['craft']=="brewery") {
-	    //	entity_obj.brew_type = 'craft';
-	    //}
 	    
 	    var posN = new L.LatLng(entity_obj['point']['lat'],
 				   entity_obj['point']['lng']);
