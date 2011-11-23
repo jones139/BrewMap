@@ -8,15 +8,18 @@
     <link rel="stylesheet" href="js/leaflet.css" />
   </head>
   <body>
-    <div id="page">
-      <div id="header">
-	<h2>OSM Brew Map (Client Rendering)</h2>
-      </div>
-      <div id="editDiv">
+      <div id="map"></div>
+
+	
+      <div id="sidebar">
+	<h1>OSM Brew Map</h1>
+        <p class="warning">Uses client rendering</p>
+
+	<p>The project is <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries">described on the OpenStreetMap Wiki</a></p>
+
+	<div id="editDiv">
 	<button id="editButton">Edit Map</button><a href="" id="permaLink">permaLink</a>
       </div>
-      <div id="main">
-	<div id="map"></div>
 
 	<div id="key">
 	  <h2>Key</h2>
@@ -41,34 +44,33 @@
 	<div id="stats">
 		<h2>Statistics</h2>
 		<table>
-		  <tr><th>Type</th><th>n</th><th>w</th><th>t</th></tr>
+		<thead>
+		  <tr>
+		  	<th>Type</th>
+			<th><abbr title="Number of Nodes">N</abbr></th>
+			<th><abbr title="Number of ways (and areas)">W</abbr></th>
+			<th><abbr title="Total">T</abbr></th>
+		</tr>
+		</thead>
+		<tbody>
 
+		</tbody>
 		</table>
-		<p>where n=number of nodes, w=number of ways (areas) and t=total number of each facility.</p>
 	</div>
-      </div>
 
-      <div id="footer">
-	<p>Map data (c) OpenStreetMap contributors, CC-BY-SA.  
-	  For more information please see <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries"> the OpenStreetMap Wiki page</a>.</p>
 	<p>A list of possible tagging errors (ie name contains 'brewery' but it is not on this map, can be seen on the <a href="tagQueries.html">tagQueries</a> page).</p>
 	<p><a href="http://maps.webhop.net/state.txt">Database Status </a></p>
-	<p>If you find problems with this page, please either raise an 
-	  <a href="https://github.com/jones139/BrewMap/issues">issue</a> on the project 
+	<p>Report <strong><a href="https://github.com/jones139/BrewMap/issues">issues</a></strong> on the project 
 	  <a href="https://github.com/jones139/BrewMap">github page</a>, 
 	  or contact Graham Jones (grahamjones139 at gmail.com).</p>
-	<div id="table">
+
+	<p class="attribution">Map data © OpenStreetMap contributors, CC-BY-SA.</p> 
 	</div>
-      </div>
-    </div>
-   <script src="js/leaflet.js"></script>
-   <script src="js/jquery-1.7.min.js"></script>
-   <script src="js/geturl.js"></script>
-   <script src="js/brewmap.js"></script>
-    <script>
-      $(document).ready(function(){
-          initialise_brewmap();
-      });
-    </script>
-  </body>
+</body>
+
+<script src="js/leaflet.js"></script>
+<script src="js/jquery-1.7.min.js"></script>
+<script src="js/geturl.js"></script>
+<script src="js/brewmap.js"></script>
+
 </html>
