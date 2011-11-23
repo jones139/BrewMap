@@ -282,8 +282,6 @@ var address = {
 	url: 'http://open.mapquestapi.com/nominatim/v1/reverse?',
 	data: {},
 	search: function (entity_data) {
-		console.log(entity_data);
-	
 		this.id = entity_data.id;
 		this.type = entity_data.type;
 		this.osm = entity_data;
@@ -300,13 +298,12 @@ var address = {
 				type_char = 'W';
 				break;
 			default:
-				console.log(type_char);
 				throw "Failed to match entity type";
 				return;
 		}
 		this.query = [this.url,'osm_id=',this.id,'&osm_type=',
 				type_char,'&format=json&json_callback=?'].join('');
-		console.log(this.query);
+		console.info(this.query);
 	},
 	// Check for data that needs to be merged
 	// Trying to use names consistent with addr:*
@@ -318,6 +315,14 @@ var address = {
 				'street': osm['addr:street'],
 				'postcode': osm['addr:postcode'],
 				'city': osm['addr:city']};
+
+		if(nominatim === undefined) {
+			console.warn('No Nominatim data, so not merging',address.process);
+			
+			this.merged = merged;
+			this.marked = marked;
+			return false;	
+		}
 
 		if(nominatim.house_number !== undefined &&
 		merged.housenumber === undefined) {
@@ -364,7 +369,6 @@ var address = {
 
 		var merged = this.merged;
 		var marked = this.marked;
-		console.log(merged);
 
 		var to_add = [[merged.suburb,marked.suburb], [merged.city,marked.city], [merged.county,marked.county],[merged.postcode,marked.postcode]];
 		var to_add_len = to_add.length;
@@ -381,6 +385,13 @@ var address = {
 				street_value = ['<span class="marked">',street_value,'</span>'].join('');
 			}
 			bits.push(street_value);
+		}
+		else {
+			var house_value = merged.housenumber;
+			if(marked.housenumber === true) {
+				house_value = ['<span class="marked">',house_value,'</span>'].join('');
+			}
+			bits.push(house_value);
 		}
 
 		// Loop through address data adding to bits
@@ -402,11 +413,11 @@ var address = {
 		var data = jQuery.getJSON(this.query, function(data) {
 			// Nominatim will set the error property
 			if(data.error !== undefined) {
-				console.log(data.error);
-				return false;
+				console.warn(data.error,address.get);
 			}
-			address.nominatim = data.address;
-			console.log(address.nominatim);
+			else {
+				address.nominatim = data.address;
+			}
 			address.add();
 		});
 	}	
