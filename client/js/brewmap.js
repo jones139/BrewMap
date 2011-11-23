@@ -284,6 +284,11 @@ var address = {
 		this.id = entity_data.id;
 		this.type = entity_data.type;
 		this.osm = entity_data;
+
+		this.marked = {};
+		this.merged = {};
+		this.nominatim = {};
+
 		this.make_query();
 		this.get();
 	},
@@ -309,7 +314,7 @@ var address = {
 	process: function() {
 		var osm = this.osm;
 		var nominatim = this.nominatim;
-		var marked = {};
+		var marked = this.marked;
 		var merged = {'housenumber': osm['addr:housenumber'],
 				'street': osm['addr:street'],
 				'postcode': osm['addr:postcode'],
@@ -413,6 +418,7 @@ var address = {
 			// Nominatim will set the error property
 			if(data.error !== undefined) {
 				console.warn(data.error,address.get);
+				address.nominatim = undefined;
 			}
 			else {
 				address.nominatim = data.address;
