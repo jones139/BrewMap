@@ -258,11 +258,10 @@ function editButtonCallback() {
     var swPoint = bounds.getSouthWest();
     var nePoint = bounds.getNorthEast();
     var zoom = map.getZoom();
-    var url = "http://www.openstreetmap.org/edit?bbox="
-	+ swPoint.lng + "%2C" + swPoint.lat + "%2C" 
-	+ nePoint.lng + "%2C" + nePoint.lat
-    window.open(url);
-    
+    var url = ["http://www.openstreetmap.org/edit?bbox=",
+	swPoint.lng, "%2C", swPoint.lat, "%2C" 
+	, nePoint.lng, "%2C", nePoint.lat].join('');
+    window.open(url); 
 }
 
 function updatePermaLink() {
@@ -273,9 +272,9 @@ function updatePermaLink() {
     var curLon = centrePt.lng;
     var curZoom = map.getZoom();
     var pageURL = document.location.href.split('?')[0];
-    var hrefURL = pageURL + '?lon='+curLon+'&lat='+curLat+'&z='+curZoom;
-    jQuery('#permaLink').attr('href',hrefURL);
-    
+    var hrefURL = [pageURL, '?lon=', curLon, '&lat=', curLat, '&z=',
+        curZoom].join('');
+    jQuery('#permaLink').attr('href',hrefURL); 
 }
 
 var address = {
