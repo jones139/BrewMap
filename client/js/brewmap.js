@@ -33,6 +33,10 @@ var imageURL;              // the base url to be used for images.
 var map;                   // the map object
 var layerDefs = {};        // the icon layer definitions from the config. file.
 
+$(document).ready(function(){
+          initialise_brewmap();
+});
+
 
 function makeIcons() {
     // Create Leaflet Icons using the images specified in layerDefs.
@@ -224,7 +228,7 @@ function addKey(layerName,iconImg) {
 
 function updateStatistics(layerName, layerStats) {
 	// Using append to progressively add to existing content
-	$('#stats table').append(["<tr><td>", layerName, "</td><td>",
+	$('#stats table tbody').append(["<tr><td>", layerName, "</td><td>",
 				  layerStats.nNode, "</td><td>",layerStats.nWay, "</td>",
 				  "<td>",layerStats.nNode+layerStats.nWay,
 				  "</td></tr>"].join(''));
