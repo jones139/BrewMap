@@ -130,15 +130,14 @@ function loadDataSuccess(dataObj,layerName) {
 
 	    var marker = new L.Marker(posN, {icon: layer['icon']});
 
-	    marker.brewmap = {};
-	    marker.brewmap.osm_id = entity_obj['osm_id'];
-	    marker.brewmap.type = entity_obj['type'];
+
+	    marker.brewmap = entity_obj;
 
 	    marker.bindPopup(popup.content(entity_obj));
 	    marker.on('click', function(e) {
 		address.target = e.target;
 		var data = e.target.brewmap;
-		address.search(data.osm_id, data.type);
+		address.search(data);
 	    });
 	    map.addLayer(marker);
 	
@@ -259,11 +258,10 @@ function editButtonCallback() {
     var swPoint = bounds.getSouthWest();
     var nePoint = bounds.getNorthEast();
     var zoom = map.getZoom();
-    var url = "http://www.openstreetmap.org/edit?bbox="
-	+ swPoint.lng + "%2C" + swPoint.lat + "%2C" 
-	+ nePoint.lng + "%2C" + nePoint.lat
-    window.open(url);
-    
+    var url = ["http://www.openstreetmap.org/edit?bbox=",
+	swPoint.lng, "%2C", swPoint.lat, "%2C" 
+	, nePoint.lng, "%2C", nePoint.lat].join('');
+    window.open(url); 
 }
 
 function updatePermaLink() {
@@ -274,16 +272,23 @@ function updatePermaLink() {
     var curLon = centrePt.lng;
     var curZoom = map.getZoom();
     var pageURL = document.location.href.split('?')[0];
-    var hrefURL = pageURL + '?lon='+curLon+'&lat='+curLat+'&z='+curZoom;
-    jQuery('#permaLink').attr('href',hrefURL);
-    
+    var hrefURL = [pageURL, '?lon=', curLon, '&lat=', curLat, '&z=',
+        curZoom].join('');
+    jQuery('#permaLink').attr('href',hrefURL); 
 }
 
 var address = {
 	url: 'http://open.mapquestapi.com/nominatim/v1/reverse?',
-	search: function (id, type) {
-		this.id = id;
-		this.type = type;
+	data: {},
+	search: function (entity_data) {
+		this.id = entity_data.id;
+		this.type = entity_data.type;
+		this.osm = entity_data;
+
+		this.marked = {};
+		this.merged = {};
+		this.nominatim = {};
+
 		this.make_query();
 		this.get();
 	},
@@ -297,42 +302,128 @@ var address = {
 				type_char = 'W';
 				break;
 			default:
-				console.log(type_char)
 				throw "Failed to match entity type";
 				return;
 		}
 		this.query = [this.url,'osm_id=',this.id,'&osm_type=',
 				type_char,'&format=json&json_callback=?'].join('');
-		console.log(this.query);
+		console.info(this.query);
 	},
-	add: function(data) {
-		var name_arr = data.display_name.split(',');
-		var first_bits_arr = name_arr.slice(1,4);
-	
-		console.log(data);
-	
-		// Check for postcode
-		if(data.address.postcode !== undefined) {
-			first_bits_arr.push(data.address.postcode);
+	// Check for data that needs to be merged
+	// Trying to use names consistent with addr:*
+	process: function() {
+		var osm = this.osm;
+		var nominatim = this.nominatim;
+		var marked = this.marked;
+		var merged = {'housenumber': osm['addr:housenumber'],
+				'street': osm['addr:street'],
+				'postcode': osm['addr:postcode'],
+				'city': osm['addr:city']};
+
+		if(nominatim === undefined) {
+			console.warn('No Nominatim data, so not merging',address.process);
+			
+			this.merged = merged;
+			this.marked = marked;
+			return false;	
 		}
-		if(data.address.house_number !== undefined) {
-			if(data.address.house_number === first_bits_arr[0].trim()) {
-				var joined_num_and_st = first_bits_arr.splice(0,2).join(' ');
-				first_bits_arr.unshift(joined_num_and_st);
+
+		if(nominatim.house_number !== undefined &&
+		merged.housenumber === undefined) {
+			merged.housenumber = nominatim.house_number;
+			marked.housenumber = true;
+		}
+		if(nominatim.road !== undefined &&
+		merged.street === undefined) {
+			merged.street = nominatim.road;
+			marked.street = true;
+		}
+		if(nominatim.town !== undefined &&
+		merged.city === undefined) {
+			merged.city = nominatim.town;
+			marked.city = true;
+		}
+		else if(nominatim.city !== undefined &&
+		merged.city === undefined) {
+			merged.city = nominatim.city;
+			marked.city = true;
+		}
+
+		if(nominatim.postcode !== undefined &&
+		merged.postcode === undefined) {
+			merged.postcode = nominatim.postcode;
+			marked.postcode = true;
+		}
+
+		if(nominatim.suburb !== undefined) {
+			merged.suburb = nominatim.suburb;
+			marked.suburb = true;
+		}
+
+		if(nominatim.county !== undefined) {
+			merged.county = nominatim.county;
+			marked.county = true;
+		}
+		
+		this.merged = merged;
+		this.marked = marked;
+	},
+	add: function() {
+		this.process();
+
+		var merged = this.merged;
+		var marked = this.marked;
+
+		var to_add = [[merged.suburb,marked.suburb], [merged.city,marked.city], [merged.county,marked.county],[merged.postcode,marked.postcode]];
+		var to_add_len = to_add.length;
+		var bits = [];
+
+		// Merge house number and street together where appropriate
+		if(merged.housenumber !== undefined &&
+		merged.street !== undefined) {
+			bits.push([merged.housenumber,' ',merged.street].join(''));
+		}
+		else if(merged.street !== undefined) {
+			var street_value = merged.street;
+			if(marked.street === true) {
+				street_value = ['<span class="marked">',street_value,'</span>'].join('');
+			}
+			bits.push(street_value);
+		}
+		else {
+			var house_value = merged.housenumber;
+			if(marked.housenumber === true) {
+				house_value = ['<span class="marked">',house_value,'</span>'].join('');
+			}
+			bits.push(house_value);
+		}
+
+		// Loop through address data adding to bits
+		for(var i=0; i<to_add_len; i++) {
+			var to_add_i = to_add[i];
+			if(to_add_i[0] !== undefined) {
+				var value = to_add_i[0];
+				if(to_add_i[1] === true) {
+					value = ['<span class="marked">',value,'</span>'].join('');
+				}
+				bits.push(value);
 			}
 		}
 
 		$(this.target._popup._contentNode).find('div.address')
-			.html(first_bits_arr.join(',<br />'));
+			.html(bits.join(',<br />'));
 	},
 	get: function() {
 		var data = jQuery.getJSON(this.query, function(data) {
 			// Nominatim will set the error property
 			if(data.error !== undefined) {
-				console.log(data.error);
-				return false;
+				console.warn(data.error,address.get);
+				address.nominatim = undefined;
 			}
-			address.add(data);		
+			else {
+				address.nominatim = data.address;
+			}
+			address.add();
 		});
 	}	
 }
