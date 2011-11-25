@@ -81,7 +81,9 @@ function load_brewmap_data() {
     makeIcons();
 
     var layers = layerDefs['layerGroups'][layerGroup].layers;
+    var i = 0;
     for (var layerName in layers) {
+	i = i+1;
 	//alert("Loading Layer "+layerName+", "+typeof(layerName));
 	// This loads the required file, and passes it to 
 	// loadDataSuccess, along with an extra
@@ -93,6 +95,8 @@ function load_brewmap_data() {
 	    bound_loadDataSuccess(layerName)
 	);
     }
+    stats.count = i;
+    keys.count = i;
 }
 
 function bound_loadDataSuccess(layerName) {
@@ -115,39 +119,46 @@ function bound_loadDataSuccess(layerName) {
  *       It parses the file to create the map objects for display.
  * HIST: 12Nov2011  GJ  ORIGINAL VERSION
  * 	 15Nov2011 Craig Loftus Moved pop-up content out
+ * 	 25Nov2011 Craig Loftus Moved stats counting in
  */
 function loadDataSuccess(dataObj,layerName) {
 
-    var layer = layerDefs['layerGroups'][layerGroup].layers[layerName];
-    
-    for (entity in dataObj) {
-	if (entity != 'layerName') {
+	var layer = layerDefs['layerGroups'][layerGroup].layers[layerName];
+	var layer_label = layer.label, layer_icon = layer.icon;
+	var nNode=0, nWay=0;
+	var local_map = map;
+ 
+	for (entity in dataObj) {
+		// Local cache to reduce searching
+		var entity_obj = dataObj[entity];
+		// Storing id in object for use in pop-up
+		entity_obj.brew_type = layer_label;
 
-	    // Local cache to reduce searching
-	    var entity_obj = dataObj[entity];
-	    // Storing id in object for use in pop-up
-	    entity_obj.brew_type = layer['label'];
-	    
-	    var posN = new L.LatLng(entity_obj['point']['lat'],
-				   entity_obj['point']['lng']);
+		var posN = new L.LatLng(entity_obj.point.lat,
+			entity_obj.point.lng);
 
-	    var marker = new L.Marker(posN, {icon: layer['icon']});
+		var marker = new L.Marker(posN, {icon: layer_icon});
 
+		marker.brewmap = entity_obj;
 
-	    marker.brewmap = entity_obj;
+		marker.bindPopup(popup.content(entity_obj));
+		marker.on('click', function(e) {
+			address.target = e.target;
+			var data = e.target.brewmap;
+			address.search(data);
+		});
+		local_map.addLayer(marker);
 
-	    marker.bindPopup(popup.content(entity_obj));
-	    marker.on('click', function(e) {
-		address.target = e.target;
-		var data = e.target.brewmap;
-		address.search(data);
-	    });
-	    map.addLayer(marker);
-	
-	} 
-    }
-    addStatistics(layer['label'],dataObj);
-    addKey(layer['label'],layer['iconImg']);
+		if(entity_obj.type === 'node') {
+			nNode = nNode+1;
+		}
+		else if(entity_obj.type ==='way') {
+			nWay = nWay+1;
+		}
+	}
+
+	stats.save(layer_label,nNode,nWay);
+	keys.save(layer_label,layer.iconImg);
 }
 
 /*
@@ -214,47 +225,88 @@ var popup = {
     }
 };
 
-
-function addKey(layerName,iconImg) {
-    $('#key table').append(
-			   [
-			    '<tr><td>',
-			    layerName,
-			    '</td><td>',
-			    '<img src=\"images/',iconImg,'\" width=24>',
-			    '</td></tr>'].join(''));
-}
-
-function updateStatistics(layerName, layerStats) {
-	// Using append to progressively add to existing content
-	$('#stats table tbody').append(["<tr><td>", layerName, "</td><td>",
-				  layerStats.nNode, "</td><td>",layerStats.nWay, "</td>",
-				  "<td>",layerStats.nNode+layerStats.nWay,
-				  "</td></tr>"].join(''));
-}
-
-function addStatistics(layerName,dataObj) {
-    var layerStatistics = {};
-    var nWay = 0;
-    var nNode = 0;
-
-    for (entity in dataObj) {
-	if (entity != 'layerName') {
-	    if (dataObj[entity].type === 'node') {
-	        nNode=nNode+1;
-	    }
-	    if (dataObj[entity].type === 'way') {
-	        nWay=nWay+1;
-	    }
+// TODO create a parent for the keys and stats objects
+// TODO generate() should probably be triggered by an event
+var keys = {
+	// Locate in DOM the place to add the fragment
+	container: $('#key table'),
+	// Create the fragment to store rows in
+	fragment: document.createDocumentFragment(),
+	// Container for counts,
+	data: [],
+	save: function(layer_name, icon_img) {
+		this.data.push({'name':layer_name,'icon_img':icon_img});
+		this.decrement();
+	},
+	decrement: function() {
+		this.count = this.count-1;
+		if(this.count < 1) {
+			this.generate();
+		}
+	},
+	make_row: function(layer) {
+		// Create the new row element
+		var row = document.createElement('tr');
+		// Set the content of the row
+		row.innerHTML = ['<td>',layer.name,'</td><td>',
+				'<img src="images/', layer.icon_img,
+				'" style="width:24px;" /></td>'].join('');
+		// Store the row
+		this.fragment.appendChild(row);		
+	},
+	generate: function() {
+		var data = this.data;
+		for(var i=data.length; i--;) {
+			this.make_row(data[i]);
+		}
+		this.display();
+	},
+	// Add the fragment to the DOM
+	display: function() {
+		this.container.append(this.fragment);
 	}
-    }
-
-    layerStatistics.nWay = nWay;
-    layerStatistics.nNode = nNode;
-
-    // Calling update to add new stats for this layer
-    updateStatistics(layerName, layerStatistics);
 }
+
+var stats = {
+	// Locate in DOM the place to add the fragment
+	container: $('#stats table tbody'),
+	// Create the fragment to store rows in
+	fragment: document.createDocumentFragment(),
+	// Container for counts,
+	data: [],
+	save: function(layer_name, nNode, nWay) {
+		this.data.push({'name':layer_name,'nodes':nNode,'ways':nWay});
+		this.decrement();
+	},
+	decrement: function() {
+		this.count = this.count-1;
+		if(this.count < 1) {
+			this.generate();
+		}
+	},
+	make_row: function(layer) {
+		// Create the new row element
+		var row = document.createElement('tr');
+		// Set the content of the row
+		row.innerHTML = ['<td>', layer.name, '</td><td>', layer.nodes,
+				'</td><td>', layer.ways, '</td><td>', 
+				layer.nodes+layer.ways, '</td>'].join('');
+		// Store the row
+		this.fragment.appendChild(row);		
+	},
+	// Make the rows
+	generate: function() {
+		var data = this.data;
+		for(var i=data.length; i--;) {
+			this.make_row(data[i]);
+		}
+		this.display();
+	},
+	// Add the fragment to the DOM
+	display: function() {
+		this.container.append(this.fragment);
+	}
+};
 
 function editButtonCallback() {
     var bounds = map.getBounds();
