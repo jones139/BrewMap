@@ -126,7 +126,6 @@ function loadDataSuccess(dataObj,layerName) {
 	    // Local cache to reduce searching
 	    var entity_obj = dataObj[entity];
 	    // Storing id in object for use in pop-up
-	    entity_obj.id = entity;
 	    entity_obj.brew_type = layer['label'];
 	    
 	    var posN = new L.LatLng(entity_obj['point']['lat'],
@@ -204,10 +203,10 @@ var popup = {
 	}
 
 	output.push(['<p class="edit">#<a href="http://www.openstreetmap.org/browse/',
-		entity_obj['type'],'/',
-		entity_obj['id'],
+		entity_obj.type,'/',
+		entity_obj.osm_id,
 		'" target="_blank">',
-		entity_obj['id'],'</a></p>'].join(''));
+		entity_obj.osm_id,'</a></p>'].join(''));
 
 	output.push('</div>');
 
@@ -285,7 +284,7 @@ var address = {
 	url: 'http://open.mapquestapi.com/nominatim/v1/reverse?',
 	data: {},
 	search: function (entity_data) {
-		this.id = entity_data.id;
+		this.osm_id = entity_data.osm_id;
 		this.type = entity_data.type;
 		this.osm = entity_data;
 
@@ -309,7 +308,7 @@ var address = {
 				throw "Failed to match entity type";
 				return;
 		}
-		this.query = [this.url,'osm_id=',this.id,'&osm_type=',
+		this.query = [this.url,'osm_id=',this.osm_id,'&osm_type=',
 				type_char,'&format=json&json_callback=?'].join('');
 		console.info(this.query);
 	},
