@@ -111,6 +111,26 @@ function bound_loadDataSuccess(layerName) {
     };
 }
 
+var brewmap = {
+	map_layer: {},
+	local_map: map,
+	toggle: function(layer_label) {
+		var layer = this.map_layer[layer_label];
+		if(layer === undefined) {
+			throw "Layer not defined";
+		}
+
+		if(layer.brewmap === true) {
+			map.removeLayer(layer);
+			layer.brewmap = false;
+		}
+		else {
+			map.addLayer(layer);
+			layer.brewmap = true;
+		}
+	}
+};
+
 /* 
  * NAME: loadDataSuccess(data,statusText)
  * DESC: This function is called when a brewery datafile is successfully 
@@ -121,9 +141,9 @@ function bound_loadDataSuccess(layerName) {
  * 	 15Nov2011 Craig Loftus Moved pop-up content out
  * 	 25Nov2011 Craig Loftus Moved stats counting in
  */
-function loadDataSuccess(dataObj,layerName) {
+function loadDataSuccess(dataObj,layer_name) {
 
-	var layer = layerDefs['layerGroups'][layerGroup].layers[layerName];
+	var layer = layerDefs['layerGroups'][layerGroup].layers[layer_name];
 	var layer_label = layer.label, layer_icon = layer.icon;
 	var nNode=0, nWay=0;
 
@@ -158,7 +178,9 @@ function loadDataSuccess(dataObj,layerName) {
 		}
 	}
 
+	brewmap.map_layer[layer_label] = group;
 	map.addLayer(group);
+	group.brewmap = true;
 
 	stats.save(layer_label,nNode,nWay);
 	keys.save(layer_label,layer.iconImg);
@@ -254,6 +276,12 @@ var keys = {
 		row.innerHTML = ['<td>',layer.name,'</td><td>',
 				'<img src="images/', layer.icon_img,
 				'" style="width:24px;" /></td>'].join('');
+
+		$(row).on('click',function(e) { 
+			brewmap.toggle(layer.name);
+			$(row).toggleClass('hidden');
+		});
+
 		// Store the row
 		this.fragment.appendChild(row);		
 	},
@@ -500,7 +528,6 @@ function initialise_brewmap() {
     URLParts = pageURL.split('/');
     URLParts[URLParts.length - 1] = 'images';
     imageURL = URLParts.join('/');
-
 
     //Now read any GET variariables from the URL (to use for permalinks etc.)
     //These are used to set up the initial state of the map.
