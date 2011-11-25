@@ -126,7 +126,8 @@ function loadDataSuccess(dataObj,layerName) {
 	var layer = layerDefs['layerGroups'][layerGroup].layers[layerName];
 	var layer_label = layer.label, layer_icon = layer.icon;
 	var nNode=0, nWay=0;
-	var local_map = map;
+
+	var group = new L.LayerGroup();
  
 	for (entity in dataObj) {
 		// Local cache to reduce searching
@@ -147,7 +148,7 @@ function loadDataSuccess(dataObj,layerName) {
 			var data = e.target.brewmap;
 			address.search(data);
 		});
-		local_map.addLayer(marker);
+		group.addLayer(marker);
 
 		if(entity_obj.type === 'node') {
 			nNode = nNode+1;
@@ -156,6 +157,8 @@ function loadDataSuccess(dataObj,layerName) {
 			nWay = nWay+1;
 		}
 	}
+
+	map.addLayer(group);
 
 	stats.save(layer_label,nNode,nWay);
 	keys.save(layer_label,layer.iconImg);
