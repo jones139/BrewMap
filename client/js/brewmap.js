@@ -476,7 +476,7 @@ var address = {
 			}
 			bits.push(street_value);
 		}
-		else {
+		else if(merged.housenumber !== undefined) {
 			var house_value = merged.housenumber;
 			if(marked.housenumber === true) {
 				house_value = ['<span class="marked">',house_value,'</span>'].join('');
