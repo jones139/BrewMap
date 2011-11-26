@@ -26,7 +26,9 @@ The code in this repository includes jQuery (http://jquery.org) and Leaflet (htt
 
 The factory, house, wine glass and grapes images are from http://www.freeiconsweb.com/Free-Downloads.asp?id=1291
 
-Craig Loftus helped sort out my problems with javascript variable scope in the client.
+Craig Loftus developed most of the client side code.
+
+Donald Noble provided the distillery still icon.
 
 
 Licence
