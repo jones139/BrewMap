@@ -43,6 +43,8 @@ h1 {
 
 #sidebar p{font-size:80%;}
 
+tr.hidden td{text-decoration: line-through;}
+
 /* Pop-up styling */
 .details, .details h3 {
     margin-bottom:0;

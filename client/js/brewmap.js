@@ -52,7 +52,7 @@ function makeIcons() {
 		iconSize: new L.Point(16,16),
 		shadowSize: new L.Point(16,16),
 		iconAnchor: new L.Point(8,8),
-		popupAnchor: new L.Point(8,24)
+	    popupAnchor: new L.Point(0,0)
 	    });
 	layers[layerName]['icon'] = new iconType();
     }
@@ -81,7 +81,9 @@ function load_brewmap_data() {
     makeIcons();
 
     var layers = layerDefs['layerGroups'][layerGroup].layers;
+    var i = 0;
     for (var layerName in layers) {
+	i = i+1;
 	//alert("Loading Layer "+layerName+", "+typeof(layerName));
 	// This loads the required file, and passes it to 
 	// loadDataSuccess, along with an extra
@@ -93,6 +95,8 @@ function load_brewmap_data() {
 	    bound_loadDataSuccess(layerName)
 	);
     }
+    stats.count = i;
+    keys.count = i;
 }
 
 function bound_loadDataSuccess(layerName) {
@@ -107,6 +111,26 @@ function bound_loadDataSuccess(layerName) {
     };
 }
 
+var brewmap = {
+	map_layer: {},
+	local_map: map,
+	toggle: function(layer_label) {
+		var layer = this.map_layer[layer_label];
+		if(layer === undefined) {
+			throw "Layer not defined";
+		}
+
+		if(layer.brewmap === true) {
+			map.removeLayer(layer);
+			layer.brewmap = false;
+		}
+		else {
+			map.addLayer(layer);
+			layer.brewmap = true;
+		}
+	}
+};
+
 /* 
  * NAME: loadDataSuccess(data,statusText)
  * DESC: This function is called when a brewery datafile is successfully 
@@ -115,40 +139,51 @@ function bound_loadDataSuccess(layerName) {
  *       It parses the file to create the map objects for display.
  * HIST: 12Nov2011  GJ  ORIGINAL VERSION
  * 	 15Nov2011 Craig Loftus Moved pop-up content out
+ * 	 25Nov2011 Craig Loftus Moved stats counting in
  */
-function loadDataSuccess(dataObj,layerName) {
+function loadDataSuccess(dataObj,layer_name) {
 
-    var layer = layerDefs['layerGroups'][layerGroup].layers[layerName];
-    
-    for (entity in dataObj) {
-	if (entity != 'layerName') {
+	var layer = layerDefs['layerGroups'][layerGroup].layers[layer_name];
+	var layer_label = layer.label, layer_icon = layer.icon;
+	var nNode=0, nWay=0;
 
-	    // Local cache to reduce searching
-	    var entity_obj = dataObj[entity];
-	    // Storing id in object for use in pop-up
-	    entity_obj.id = entity;
-	    entity_obj.brew_type = layer['label'];
-	    
-	    var posN = new L.LatLng(entity_obj['point']['lat'],
-				   entity_obj['point']['lng']);
+	var group = new L.LayerGroup();
+ 
+	for (entity in dataObj) {
+		// Local cache to reduce searching
+		var entity_obj = dataObj[entity];
+		// Storing id in object for use in pop-up
+		entity_obj.brew_type = layer_label;
 
-	    var marker = new L.Marker(posN, {icon: layer['icon']});
+		var posN = new L.LatLng(entity_obj.point.lat,
+			entity_obj.point.lng);
 
+		var marker = new L.Marker(posN, {icon: layer_icon});
 
-	    marker.brewmap = entity_obj;
+		marker.brewmap = entity_obj;
 
-	    marker.bindPopup(popup.content(entity_obj));
-	    marker.on('click', function(e) {
-		address.target = e.target;
-		var data = e.target.brewmap;
-		address.search(data);
-	    });
-	    map.addLayer(marker);
-	
-	} 
-    }
-    addStatistics(layer['label'],dataObj);
-    addKey(layer['label'],layer['iconImg']);
+		marker.bindPopup(popup.content(entity_obj));
+		marker.on('click', function(e) {
+			address.target = e.target;
+			var data = e.target.brewmap;
+			address.search(data);
+		});
+		group.addLayer(marker);
+
+		if(entity_obj.type === 'node') {
+			nNode = nNode+1;
+		}
+		else if(entity_obj.type ==='way') {
+			nWay = nWay+1;
+		}
+	}
+
+	brewmap.map_layer[layer_label] = group;
+	map.addLayer(group);
+	group.brewmap = true;
+
+	stats.save(layer_label,nNode,nWay);
+	keys.save(layer_label,layer.iconImg);
 }
 
 /*
@@ -204,10 +239,10 @@ var popup = {
 	}
 
 	output.push(['<p class="edit">#<a href="http://www.openstreetmap.org/browse/',
-		entity_obj['type'],'/',
-		entity_obj['id'],
+		entity_obj.type,'/',
+		entity_obj.osm_id,
 		'" target="_blank">',
-		entity_obj['id'],'</a></p>'].join(''));
+		entity_obj.osm_id,'</a></p>'].join(''));
 
 	output.push('</div>');
 
@@ -215,47 +250,94 @@ var popup = {
     }
 };
 
+// TODO create a parent for the keys and stats objects
+// TODO generate() should probably be triggered by an event
+var keys = {
+	// Locate in DOM the place to add the fragment
+	container: $('#key table'),
+	// Create the fragment to store rows in
+	fragment: document.createDocumentFragment(),
+	// Container for counts,
+	data: [],
+	save: function(layer_name, icon_img) {
+		this.data.push({'name':layer_name,'icon_img':icon_img});
+		this.decrement();
+	},
+	decrement: function() {
+		this.count = this.count-1;
+		if(this.count < 1) {
+			this.generate();
+		}
+	},
+	make_row: function(layer) {
+		// Create the new row element
+		var row = document.createElement('tr');
+		// Set the content of the row
+		row.innerHTML = ['<td>',layer.name,'</td><td>',
+				'<img src="images/', layer.icon_img,
+				'" style="width:24px;" /></td>'].join('');
 
-function addKey(layerName,iconImg) {
-    $('#key table').append(
-			   [
-			    '<tr><td>',
-			    layerName,
-			    '</td><td>',
-			    '<img src=\"images/',iconImg,'\" width=24>',
-			    '</td></tr>'].join(''));
-}
+		$(row).on('click',function(e) { 
+			brewmap.toggle(layer.name);
+			$(row).toggleClass('hidden');
+		});
 
-function updateStatistics(layerName, layerStats) {
-	// Using append to progressively add to existing content
-	$('#stats table tbody').append(["<tr><td>", layerName, "</td><td>",
-				  layerStats.nNode, "</td><td>",layerStats.nWay, "</td>",
-				  "<td>",layerStats.nNode+layerStats.nWay,
-				  "</td></tr>"].join(''));
-}
-
-function addStatistics(layerName,dataObj) {
-    var layerStatistics = {};
-    var nWay = 0;
-    var nNode = 0;
-
-    for (entity in dataObj) {
-	if (entity != 'layerName') {
-	    if (dataObj[entity].type === 'node') {
-	        nNode=nNode+1;
-	    }
-	    if (dataObj[entity].type === 'way') {
-	        nWay=nWay+1;
-	    }
+		// Store the row
+		this.fragment.appendChild(row);		
+	},
+	generate: function() {
+		var data = this.data;
+		for(var i=data.length; i--;) {
+			this.make_row(data[i]);
+		}
+		this.display();
+	},
+	// Add the fragment to the DOM
+	display: function() {
+		this.container.append(this.fragment);
 	}
-    }
-
-    layerStatistics.nWay = nWay;
-    layerStatistics.nNode = nNode;
-
-    // Calling update to add new stats for this layer
-    updateStatistics(layerName, layerStatistics);
 }
+
+var stats = {
+	// Locate in DOM the place to add the fragment
+	container: $('#stats table tbody'),
+	// Create the fragment to store rows in
+	fragment: document.createDocumentFragment(),
+	// Container for counts,
+	data: [],
+	save: function(layer_name, nNode, nWay) {
+		this.data.push({'name':layer_name,'nodes':nNode,'ways':nWay});
+		this.decrement();
+	},
+	decrement: function() {
+		this.count = this.count-1;
+		if(this.count < 1) {
+			this.generate();
+		}
+	},
+	make_row: function(layer) {
+		// Create the new row element
+		var row = document.createElement('tr');
+		// Set the content of the row
+		row.innerHTML = ['<td>', layer.name, '</td><td>', layer.nodes,
+				'</td><td>', layer.ways, '</td><td>', 
+				layer.nodes+layer.ways, '</td>'].join('');
+		// Store the row
+		this.fragment.appendChild(row);		
+	},
+	// Make the rows
+	generate: function() {
+		var data = this.data;
+		for(var i=data.length; i--;) {
+			this.make_row(data[i]);
+		}
+		this.display();
+	},
+	// Add the fragment to the DOM
+	display: function() {
+		this.container.append(this.fragment);
+	}
+};
 
 function editButtonCallback() {
     var bounds = map.getBounds();
@@ -285,7 +367,7 @@ var address = {
 	url: 'http://open.mapquestapi.com/nominatim/v1/reverse?',
 	data: {},
 	search: function (entity_data) {
-		this.id = entity_data.id;
+		this.osm_id = entity_data.osm_id;
 		this.type = entity_data.type;
 		this.osm = entity_data;
 
@@ -309,7 +391,7 @@ var address = {
 				throw "Failed to match entity type";
 				return;
 		}
-		this.query = [this.url,'osm_id=',this.id,'&osm_type=',
+		this.query = [this.url,'osm_id=',this.osm_id,'&osm_type=',
 				type_char,'&format=json&json_callback=?'].join('');
 		console.info(this.query);
 	},
@@ -394,7 +476,7 @@ var address = {
 			}
 			bits.push(street_value);
 		}
-		else {
+		else if(merged.housenumber !== undefined) {
 			var house_value = merged.housenumber;
 			if(marked.housenumber === true) {
 				house_value = ['<span class="marked">',house_value,'</span>'].join('');
@@ -446,7 +528,6 @@ function initialise_brewmap() {
     URLParts = pageURL.split('/');
     URLParts[URLParts.length - 1] = 'images';
     imageURL = URLParts.join('/');
-
 
     //Now read any GET variariables from the URL (to use for permalinks etc.)
     //These are used to set up the initial state of the map.
