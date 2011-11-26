@@ -52,7 +52,7 @@ function makeIcons() {
 		iconSize: new L.Point(16,16),
 		shadowSize: new L.Point(16,16),
 		iconAnchor: new L.Point(8,8),
-		popupAnchor: new L.Point(8,24)
+	    popupAnchor: new L.Point(0,0)
 	    });
 	layers[layerName]['icon'] = new iconType();
     }
