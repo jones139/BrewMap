@@ -15,6 +15,7 @@ node,way   barrier      text         linear
 node,way   bicycle      text         nocache
 #node,way   brand        text         linear
 node,way   bridge       text         linear
+node,way   bridge_type  text         linear
 node,way   boundary     text         linear
 node,way   building     text         polygon
 node       capital      text         linear
@@ -26,6 +27,7 @@ node       ele          text         linear
 node,way   embankment   text         linear
 node,way   foot         text         linear
 node,way   generator:source    text  linear
+node,way   height       text         polygon
 node,way   highway      text         linear
 node,way   historic     text         polygon
 node,way   horse        text         linear
@@ -57,6 +59,7 @@ node,way   surface      text         linear
 node,way   toll         text         linear
 node,way   tourism      text         polygon
 node,way   tower:type   text         linear
+node,way   tower        text         polygon
 way        tracktype    text         linear
 node,way   tunnel       text         linear
 node,way   water        text         polygon
@@ -112,4 +115,17 @@ node,way  osm_timestamp  text
 node,way  civilization  text   polygon
 node,way  period        text   polygon
 node,way  era           text   polygon
+node,way  historic:civilization text polygon
+node,way  historic:period       text polygon
+node,way  historic:era          text polygon
+node,way  culture       text   polygon
+node,way  start_date    text   polygon
+node,way  end_date      text   polygon
+node,way  date          text   polygon
+node,way  geological    text   polygon
+node,way  megalith_type  text   polygon
+node,way  site_type     text   polygon
+
+#Things for waterways map
+node,way  boat           text polygon
 
