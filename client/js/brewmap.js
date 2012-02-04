@@ -40,7 +40,7 @@ $(document).ready(function(){
 
 function makeIcons() {
     // Create Leaflet Icons using the images specified in layerDefs.
-    // The icon objects are added to LayrDefs.
+    // The icon objects are added to layerDefs.
     var layers, layerName, iconURL, iconType;
     layers = layerDefs['layerGroups'][layerGroup].layers;
     for (layerName in layers) {
@@ -552,9 +552,29 @@ function initialise_brewmap() {
 
     // Initialise the map object
     map = new L.Map('map');
+
+    // Default 'normal' mapnik map
     var osmURL = 'http://tile.openstreetmap.org/{z}/{x}/{y}.png';
     var osmLayer = new L.TileLayer(osmURL,{maxZoom:18});
+    // Cycle Map
+    var cmURL = 'http://c.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png';
+    var cmLayer = new L.TileLayer(cmURL,{maxZoom:18});
+    // Transport Map
+    var tmURL = 'http://c.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
+    var tmLayer = new L.TileLayer(tmURL,{maxZoom:18});
+
+    // Show the default, other maps get set via the user selection
     map.addLayer(osmLayer);
+
+    var baseMaps = {
+	"Open Street Map": osmLayer,
+	"Open Cycle Map": cmLayer,
+	"Open Transport Map": tmLayer
+    };
+
+    var layersControl = new L.Control.Layers(baseMaps);
+    map.addControl(layersControl);
+
     map.setView(new L.LatLng(lat,lon), zoom);
     map.addEventListener('moveend',updatePermaLink);
     map.addEventListener('zoomend',updatePermaLink);
