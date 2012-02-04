@@ -40,7 +40,7 @@ $(document).ready(function(){
 
 function makeIcons() {
     // Create Leaflet Icons using the images specified in layerDefs.
-    // The icon objects are added to LayrDefs.
+    // The icon objects are added to layerDefs.
     var layers, layerName, iconURL, iconType;
     layers = layerDefs['layerGroups'][layerGroup].layers;
     for (layerName in layers) {
