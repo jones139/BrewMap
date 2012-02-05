@@ -6,16 +6,19 @@
     
     <link rel="stylesheet" href="css/brewmap.css" />
     <link rel="stylesheet" href="js/leaflet.css" />
-    <link rel="shortcut icon" href="images/beer.ico" />
+    <link id="favicon" rel="shortcut icon" href="images/beer.ico" />
   </head>
   <body>
       <div id="map"></div>
 
 	
       <div id="sidebar">
-	<h1>OSM Brew Map</h1>
-
-	<p>The project is <a href="http://wiki.openstreetmap.org/wiki/WikiProject_United_Kingdom_Breweries">described on the OpenStreetMap Wiki</a></p>
+	<h1 id="title">title</h1>
+	<div id="introDiv">
+	  <p>
+	    <span id="intro_text">introDiv Text Here.</span>
+	  </p>
+	</div>
 
 	<div id="editDiv">
 	<button id="editButton">Edit Map</button><a href="" id="permaLink">permaLink</a>
@@ -25,21 +28,6 @@
 	  <h2>Key</h2>
 	  <p>Click to hide/show.</p>
 	  <table>
-<!--	  <tr>
-	    <td>Industrial Brewery </td><td> <img src="images/factory.png" width="24"></td>
-	  </tr>
-	  <tr>
-	    <td>Craft Brewery </td><td><img src="images/house.png" width="24"></td>
-	  </tr><tr>
-	    <td>Microbrewery  </td><td><img src="images/drink.png" width="24"></td>
-	  </tr><tr>
-	    <td>Winery  </td><td><img src="images/grapes.jpg" width="24"></td>
-	  </tr><tr>
-	    <td>Distillery  </td><td><img src="images/bluedot_sm.png" width="24"></td>
-	  </tr><tr>
-	    <td>Cider/Perry  </td><td><img src="images/yellowdot_sm.png" width="24"></td>
-	  </tr>
--->
 	  </table>
 	</div>
 	<div id="stats">
@@ -59,11 +47,11 @@
 		</table>
 	</div>
 
-	<p>A list of possible tagging errors (ie name contains 'brewery' but it is not on this map, can be seen on the <a href="tagQueries.html">tagQueries</a> page).</p>
+	<p>A list of possible tagging errors (<span id="tagQuery_note">tagQuery_note</span>), can be seen on the <a href="tagQueries.html">tagQueries</a> page).</p>
 	<p><a href="http://maps.webhop.net/state.txt">Database Status </a></p>
-	<p>Report <strong><a href="https://github.com/jones139/BrewMap/issues">issues</a></strong> on the project 
-	  <a href="https://github.com/jones139/BrewMap">github page</a>, 
-	  or contact Graham Jones (grahamjones139 at gmail.com).</p>
+	<p>Report <strong><a id="gh_issues_href" href="">issues</a></strong> on the project 
+	  <a id="gh_page_href" href="">github page</a>, 
+	  or contact <span id="contact_email">Contact Details</span></p>
 
 	<p class="attribution">Map data © OpenStreetMap contributors, CC-BY-SA.</p> 
 	</div>

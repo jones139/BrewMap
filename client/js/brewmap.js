@@ -59,12 +59,12 @@ function makeIcons() {
 }
 
 
-function loadConfigFile() {
-    jQuery.getJSON(
-		   dataURL+configFname,
-		   loadConfigSuccess
-		   );
-}
+//function loadConfigFile() {
+//    jQuery.getJSON(
+//	dataURL+configFname,
+//	loadConfigSuccess
+//    );
+//}
 
 function loadConfigSuccess(dataObj) {
     // Parses the downloaded configuration file object
@@ -74,10 +74,66 @@ function loadConfigSuccess(dataObj) {
     //      16nov2011  GJ  ORIGINAL VERSION
     //alert("loadConfigSuccess - dataObj="+dataObj);
     layerDefs = dataObj;
+    setup_map_page();
     load_brewmap_data();
 }
 
+function setup_map_page() {
+    // Use data from the configuration file (stored in the layerDefs
+    // Global Variable to set up the main map page.
+    // HIST:
+    //       05feb2011  GJ  ORIGINAL VERSION
+    var defaultBaseMap;
+    var baseMap;
+    var baseMapsObj;
+    var baseMapURL;
+
+    jQuery("#title").html(layerDefs['layerGroups'][layerGroup].title);
+    jQuery("#introDiv").html(layerDefs['layerGroups'][layerGroup].intro_text);
+    jQuery("#tagQuery_note").html(layerDefs['layerGroups'][layerGroup].tagQuery_note);
+    jQuery("#gh_issues_href").attr('href',layerDefs['layerGroups'][layerGroup].github_page + "/issues");
+    jQuery("#gh_page_href").attr('href',layerDefs['layerGroups'][layerGroup].github_page);
+    jQuery("#contact_email").html(layerDefs['layerGroups'][layerGroup].contact_email);
+
+    baseMapsObj = {};
+    for (baseMap in layerDefs['layerGroups'][layerGroup]['baseMaps']) {
+	baseMapURL = layerDefs['layerGroups'][layerGroup]['baseMaps'][baseMap];
+	baseMapsObj[baseMap] = new L.TileLayer(baseMapURL,{maxZoom:18})
+	//alert("baseMap="+baseMap+" baseMapURL="+baseMapURL);
+    } 
+
+    // Initialise the map object
+    map = new L.Map('map');
+
+    // Show the default, other maps get set via the user selection
+    for (defaultBaseMap in baseMapsObj) break;  //find first base map.
+    map.addLayer(baseMapsObj[defaultBaseMap]);
+
+    var layersControl = new L.Control.Layers(baseMapsObj);
+    map.addControl(layersControl);
+
+    map.setView(new L.LatLng(lat,lon), zoom);
+    map.addEventListener('moveend',updatePermaLink);
+    map.addEventListener('zoomend',updatePermaLink);
+    
+    // Set up the Edit Button
+    jQuery('#editButton').click(editButtonCallback);
+
+
+    // Sort out the icon.
+    jQuery('#favicon').remove();
+    $('head').append('<link href="'+
+		     layerDefs['layerGroups'][layerGroup].icon+
+		     '" id="favicon" rel="shortcut icon">');
+
+
+}
+
 function load_brewmap_data() {
+    // Parses the configuration file (stored in layerDefs global variable
+    // and downloads the data files specified in the configuration file.
+    // HIST:
+    //      16nov2011 GJ ORIGINAL VERSION
     makeIcons();
 
     var layers = layerDefs['layerGroups'][layerGroup].layers;
@@ -550,39 +606,11 @@ function initialise_brewmap() {
 
     //alert("Initial Map Position is ("+lon+","+lat+"), z="+zoom);
 
-    // Initialise the map object
-    map = new L.Map('map');
-
-    // Default 'normal' mapnik map
-    var osmURL = 'http://tile.openstreetmap.org/{z}/{x}/{y}.png';
-    var osmLayer = new L.TileLayer(osmURL,{maxZoom:18});
-    // Cycle Map
-    var cmURL = 'http://c.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png';
-    var cmLayer = new L.TileLayer(cmURL,{maxZoom:18});
-    // Transport Map
-    var tmURL = 'http://c.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
-    var tmLayer = new L.TileLayer(tmURL,{maxZoom:18});
-
-    // Show the default, other maps get set via the user selection
-    map.addLayer(osmLayer);
-
-    var baseMaps = {
-	"Open Street Map": osmLayer,
-	"Open Cycle Map": cmLayer,
-	"Open Transport Map": tmLayer
-    };
-
-    var layersControl = new L.Control.Layers(baseMaps);
-    map.addControl(layersControl);
-
-    map.setView(new L.LatLng(lat,lon), zoom);
-    map.addEventListener('moveend',updatePermaLink);
-    map.addEventListener('zoomend',updatePermaLink);
-    
-    // Set up the Edit Button
-    jQuery('#editButton').click(editButtonCallback);
 
     // Add the icons to the map as defined in the configuration file
     // in global variable configFname, using layer group layerGroup
-    loadConfigFile();
+    jQuery.getJSON(
+	dataURL+configFname,
+	loadConfigSuccess
+    );
 }
