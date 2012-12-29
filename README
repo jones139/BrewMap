@@ -1,6 +1,13 @@
 UK BrewMap
 ==========
 
+NOTE:  This is the tiledData branch that is under development.  The idea is that
+rather than having a single file for each group of features, the files will
+be split into tiles to reduce the data transfer and data handling requirements
+for larger datasets.   
+
+**** This does not work yet *****
+
 Client and Server software to produce the uk brewery map based on 
 OpenStreetMap data.
 
