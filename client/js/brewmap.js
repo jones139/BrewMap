@@ -59,13 +59,6 @@ function makeIcons() {
 }
 
 
-//function loadConfigFile() {
-//    jQuery.getJSON(
-//	dataURL+configFname,
-//	loadConfigSuccess
-//    );
-//}
-
 function loadConfigSuccess(dataObj) {
     // Parses the downloaded configuration file object
     // and loads its content into global variables for use by other
@@ -135,24 +128,27 @@ function load_brewmap_data() {
     // HIST:
     //      16nov2011 GJ ORIGINAL VERSION
     makeIcons();
-
     var layers = layerDefs['layerGroups'][layerGroup].layers;
     var i = 0;
-    for (var layerName in layers) {
-	i = i+1;
+    var tilesUrl = dataURL+layerDefs['layerGroups'][layerGroup].data_tiles_url;
+    alert("tilesUrl="+tilesUrl);
+    var brewMapLayer = new BrewMapLayer(tilesUrl);
+    map.addLayer(brewMapLayer);
+    //for (var layerName in layers) {
+//	i = i+1;
 	//alert("Loading Layer "+layerName+", "+typeof(layerName));
 	// This loads the required file, and passes it to 
 	// loadDataSuccess, along with an extra
 	// argument, layerName which is the name of the Layer 
 	// just loaded, so that we only need one
 	// loadDataSuccess function, no matter how many files we need to load.
-	jQuery.getJSON(
-	    dataURL+layers[layerName]['dataFile'],
-	    bound_loadDataSuccess(layerName)
-	);
-    }
-    stats.count = i;
-    keys.count = i;
+//	jQuery.getJSON(
+//	    dataURL+layers[layerName]['dataFile'],
+//	    bound_loadDataSuccess(layerName)
+//	);
+//    }
+//    stats.count = i;
+//    keys.count = i;
 }
 
 function bound_loadDataSuccess(layerName) {

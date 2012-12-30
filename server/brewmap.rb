@@ -35,7 +35,7 @@ source :postgis, :connection_info => { :dbname => "osmgb" } do
 # Industrial Breweries
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'brewery_industrial' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'brewery_industrial' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_point
   WHERE industrial ilike('%brewery%') and (disused is null or disused != 'yes')
 ) AS points
@@ -43,7 +43,7 @@ SQL
 
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'brewery_industrial' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'brewery_industrial' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_polygon
   WHERE industrial ilike('%brewery%') and (disused is null or disused != 'yes')
 ) AS centers
@@ -53,7 +53,7 @@ SQL
 # Craft Breweries
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'brewery_craft' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'brewery_craft' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_point
   WHERE craft ilike('%brewery%') and (disused is null or disused != 'yes')
 ) AS points
@@ -61,7 +61,7 @@ SQL
 
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'brewery_craft' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'brewery_craft' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_polygon
   WHERE craft ilike('%brewery%') and (disused is null or disused != 'yes')
 ) AS centers
@@ -71,7 +71,7 @@ SQL
 # Micro Breweries
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'microbrewery' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'microbrewery' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_point
   WHERE (microbrewery is not null and microbrewery!='no') and (disused is null or disused != 'yes')
 ) AS points
@@ -79,7 +79,7 @@ SQL
 
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'microbrewery' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'microbrewery' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_polygon
   WHERE (microbrewery is not null and microbrewery!='no') and (disused is null or disused != 'yes')
 ) AS centers
@@ -89,7 +89,7 @@ SQL
 # Wineries
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'winery' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'winery' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_point
   WHERE (landuse ilike('%winery%') or craft ilike('%winery%') or industrial ilike('%winery%')) and (disused is null or disused != 'yes')
 ) AS points
@@ -97,7 +97,7 @@ SQL
 
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'winery' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'winery' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_polygon
   WHERE (landuse ilike('%winery%') or craft ilike('%winery%') or industrial ilike('%winery%')) and (disused is null or disused != 'yes')
 ) AS centers
@@ -107,7 +107,7 @@ SQL
 # Distilleries
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'distillery' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'distillery' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_point
   WHERE (landuse ilike('%distillery%') or craft ilike('%distillery%') or industrial ilike('%distillery%')) and (disused is null or disused != 'yes')
 ) AS points
@@ -115,7 +115,7 @@ SQL
 
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'distillery' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'distillery' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_polygon
   WHERE (landuse ilike('%distillery%') or craft ilike('%distillery%') or industrial ilike('%distillery%')) and (disused is null or disused != 'yes')
 ) AS centers
@@ -125,7 +125,7 @@ SQL
 # Cider/Perry
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'cider/perry' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'cider/perry' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_point
   WHERE (craft ilike('%cider%') or craft ilike('%perry%') or industrial ilike('%cider%') or industrial ilike('%perry%')) and (disused is null or disused != 'yes')
 ) AS points
@@ -133,7 +133,7 @@ SQL
 
   table <<-SQL, :geometry_column => "way", :geometry_srid => 900913, :zoom => "1-"
 (
-  SELECT osm_id, 'cider/perry' as type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
+  SELECT osm_id, 'cider/perry' as brewmap_type, name, amenity, website, url, craft, industrial, microbrewery, real_ale, way
   FROM planet_osm_polygon
   WHERE (craft ilike('%cider%') or craft ilike('%perry%') or industrial ilike('%cider%') or industrial ilike('%perry%')) and (disused is null or disused != 'yes')
 ) AS centers

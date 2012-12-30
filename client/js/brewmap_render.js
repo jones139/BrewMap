@@ -153,7 +153,7 @@ var BrewMapRender = {
   //         { 'inset': <what does this do?> }
   // 
   renderTile: function(canvas, tile, options) {
-    
+      alert("renderTile()");
     var context = canvas.getContext("2d");
     var inset = (options && options["inset"]) ? options["inset"] : 0;
     var scale = (canvas.width - inset * 2) / tile.scale;

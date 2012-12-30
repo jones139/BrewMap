@@ -23,62 +23,54 @@
 //
 ////////////////////////////////////////////////////////////////////////
 var BrewMapLayer = L.TileLayer.Canvas.extend({
-  
-  options: {},
-  
-  initialize: function(url, options) {
-    L.Util.setOptions(this, options);
-    this._url = url;
-  },
-  
-  drawTile: function(canvas, tilePoint, zoom) {
     
-    var layer = this;
+    options: {},
+    
+    initialize: function(url, options) {
+	L.Util.setOptions(this, options);
+	this._url = url;
+    },
   
-    // draw "loading" overlay
+    drawTile: function(canvas, tilePoint, zoom) {
+	
+	var layer = this;
+	
+	// draw "loading" overlay
   
-    var context = canvas.getContext("2d");
-  
-    context.fillStyle = "rgba(255, 255, 255, 0.5)";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  
-    // load the tile
-  
-    var request = new XMLHttpRequest();
-  
-    request.onreadystatechange = function() {
-      
-      if (this.readyState == this.DONE) {
-        if (this.status == 200 && this.responseText) {
-          
-          var tile = JSON.parse(this.responseText);
-          
-          if (typeof tile.crs === "undefined")
-            BrewMapLayer.projectTile(tile, tilePoint, zoom, layer.options.tileSize);
-          
-          BrewMapRender.renderTile(canvas, tile);
-          
-        }
-      }
-      
+	var context = canvas.getContext("2d");
+	
+	context.fillStyle = "rgba(255, 255, 255, 0.5)";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	
+	// load the tile
+	var url = this._url.replace("{x}", tilePoint.x).
+            replace("{y}", tilePoint.y).
+            replace("{z}", zoom);
+		
+	jQuery.ajax({
+	    'url':url,
+	    dataType:"jsonp",
+	    jsonpCallback:"tileDidLoad",
+	    success: function(data) {
+		alert("data="+data);
+		var tile = tileDidLoad;
+		alert("tile="+tile);
+		if (typeof tile.crs === "undefined")
+		    BrewMapLayer.projectTile(tile, tilePoint, zoom, 
+					     layer.options.tileSize);
+		BrewMapRender.renderTile(canvas, tile);
+	    }
+	});
+	
     }
     
-    var url = this._url.replace("{x}", tilePoint.x).
-                        replace("{y}", tilePoint.y).
-                        replace("{z}", zoom);
-  
-    request.open("GET", url, true);
-    request.send();
-    
-  }
-  
 });
 
 BrewMapLayer.EXTENT = 2 * Math.PI * 6378137;
 BrewMapLayer.ORIGIN = -(BrewMapLayer.EXTENT / 2.0);
 
 BrewMapLayer.projectTile = function(tile, tilePoint, zoom, tileSize) {
-  
+    alert("BrewMapLayer.projectTile()");
   tile.scale = tileSize;
   
   // find the tile's left and top in spherical mercator
